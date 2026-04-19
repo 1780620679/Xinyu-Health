@@ -1,0 +1,35 @@
+<template>
+  <div class="backstage-layout">
+    <el-container class="main-container">
+      <AsideBar></AsideBar>
+      <el-container>
+        <el-header>
+          <NavBar></NavBar>
+        </el-header>
+        <el-main class="main-content">
+          <router-view class="content-container"></router-view>
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+<script setup>
+import NavBar from "./NavBar.vue";
+import AsideBar from "./AsideBar.vue";
+</script>
+<style lang="scss" scoped>
+.backstage-layout {
+  height: 100vh;
+  .el-header {
+    height: 74px !important; //导航栏高度为74px提高优先级
+  }
+  .main-container {
+    height: 100%;
+    .content-container {
+      padding: 20px;
+      background-color: #fff;
+      min-height: calc(100% - 74px);
+    }
+  }
+}
+</style>
