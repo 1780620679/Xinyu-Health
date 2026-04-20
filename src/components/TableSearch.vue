@@ -28,44 +28,44 @@
   </el-form>
 </template>
 <script setup>
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue"
 
 const props = defineProps({
   formItem: {
     type: Array,
     default: () => [],
   },
-});
-const emit = defineEmits(["search"]);
+})
+const emit = defineEmits(["search"])
 
-const ruleFormRef = ref();
+const ruleFormRef = ref()
 // 搜索表单数据
-const formData = reactive({});
+const formData = reactive({})
 // 根据组件类型返回对应的组件
 const isComp = (comp) => {
   return {
     input: "el-input",
     select: "el-select",
-  }[comp];
-};
+  }[comp]
+}
 //设置响应式布局（根据屏幕宽度自动调整）
 const formDataAttrs = computed(() => {
-  const { formItem } = props;
+  const { formItem } = props
   formItem.forEach((item) => {
-    item.col = { xs: 24, sm: 12, md: 8, lg: 6, xl: 4 };
-  });
-  return formItem;
-});
+    item.col = { xs: 24, sm: 12, md: 8, lg: 6, xl: 4 } //设置响应式布局（根据屏幕宽度自动调整）默认是24列
+  })
+  return formItem
+})
 // 搜索方法
 const handleSearch = () => {
-  emit("search", formData);
-};
-// 重置方法 不能简单的formData = {};因为有的表单的默认值并非是空字符串 要查询官网文档进行重置
+  emit("search", formData)
+}
+// 重置方法 不能简单的formData = {};因为有的表单的默认值并非是空字符串 要查询官网文档进行重置操作
 const handleReset = (formEl) => {
   //先重置
-  if (!formEl) return;
-  formEl.resetFields();
+  if (!formEl) return
+  formEl.resetFields()
   //再提交调用一下
-  handleSearch();
-};
+  handleSearch()
+}
 </script>

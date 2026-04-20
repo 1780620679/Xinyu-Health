@@ -1,0 +1,18 @@
+1.封装表单组件时-----用组件通信，父组件传入所需数据（表单类型，下拉框值等），并定义一个回调函数接收，
+  子组件（表单组件）接收数据后用<component :is="函数处理">来决定渲染什么组件，在提交按钮上使用emit事件来传递给父组件表单的值，让父组件处理
+  通过element-plus的el-row/el-col实现表单的响应式布局
+
+2. //解决跨域问题
+  // 配置代理服务器 在vite.config.js里添加server: {
+    proxy: {
+      "/api": {
+        target: "http://159.75.169.224:1235",
+        changeOrigin: true,
+      },
+    },
+  },
+
+3.弹窗组件ArticleDialog进行显示隐藏通过父组件v-model:modelValue,子组件通过computed计算属性中get，set方法来emit回调关闭
+  弹窗中各个表单的属性，及其具体实现， multiple filterable allow-create clearable等（还有upload上传里好多没印象）
+  各个表单咋实现，数据怎么来的props传过来/单独定义一个死数据
+  重点上传图片逻辑 是一个文件，有单独的后端接口处理，其中要使用new FormData()，和对应的append方法创建file对象，在设置唯一标识时用到UUID，图片展示出来用到拼接==后端提供服务器地址+文件处理接口返回的filePath

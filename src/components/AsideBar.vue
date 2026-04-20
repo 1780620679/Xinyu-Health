@@ -32,26 +32,25 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
-import { useAdminStore } from "@/stores/admin";
-import { computed } from "vue";
-const router = useRouter();
-console.log(router);
+import { useRouter } from "vue-router"
+import { useAdminStore } from "@/stores/admin"
+import { computed } from "vue"
+const router = useRouter()
 // 引入admin store中的isCollapse状态,控制是否折叠侧边栏
-const AdminStore = useAdminStore();
-const isCollapse = computed(() => AdminStore.isCollapse);
+const AdminStore = useAdminStore()
+const isCollapse = computed(() => AdminStore.isCollapse)
 
 // 图标URL
-const iconUrl = new URL("@/assets/images/机器人.png", import.meta.url).href;
+const iconUrl = new URL("@/assets/images/机器人.png", import.meta.url).href
 
 // 点击菜单项时跳转路由
 const handleClick = (key) => {
-  console.log(key);
-  // 获取当前路由路径
-  const currentPath = router.options.routes[0];
+  console.log(key)
+  // 获取当前路由路径（定义路由时的path）
+  const currentPath = router.options.routes[0]
   // 点击菜单项时跳转路由
-  router.push(`${currentPath.path}/${key.index}`);
-};
+  router.push(`${currentPath.path}/${key.index}`)
+}
 </script>
 <style lang="scss" scoped>
 .menu-style {
