@@ -71,8 +71,8 @@ const submitForm = async () => {
     }
     ElMessage.success("登录成功")
     // 登录成功后，将token存储到localStorage
-    localStorage.setItem("token", res.token)
-    localStorage.setItem("userInfo", JSON.stringify(res.userInfo))
+    localStorage.setItem('token', res.token)
+    localStorage.setItem('userInfo', JSON.stringify(res.userInfo))
     // 登录成功后，跳转  后台端/用户端
     if (res.userInfo.userType === 2) {
       // 后台端

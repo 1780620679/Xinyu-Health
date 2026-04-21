@@ -11,7 +11,7 @@
         <div class="flex-box">
           <el-avatar
             src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-            size="medium"
+            size="default"
           ></el-avatar>
           <p class="user-name">用户</p>
           <el-icon><ArrowDown /></el-icon>
@@ -28,15 +28,15 @@
   </div>
 </template>
 <script setup>
-import { useAdminStore } from "@/stores/admin";
+import { useAdminStore } from "@/stores/admin"
 const handleCommand = (command) => {
-  console.log(command);
-};
+  console.log(command)
+}
 // 引入admin store中的isCollapse状态,控制是否折叠侧边栏
-const AdminStore = useAdminStore();
+const AdminStore = useAdminStore()
 const handleCollapse = () => {
-  AdminStore.toggleCollapse();
-};
+  AdminStore.toggleCollapse()
+}
 </script>
 <style lang="scss" scoped>
 .nav-bar {

@@ -28,9 +28,48 @@ export const uploadFileAPI = (file, businessInfo) => {
     url: "/file/upload",
     method: "post",
     data: formData,
-    // 上传文件时，需要设置Content-Type为multipart/form-data
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+    // 上传文件时，不需要手动设置Content-Type，axios会自动处理
+  })
+}
+//获取知识文章详情/knowledge/article/{id}
+export const getKnowledgeArticleDetailAPI = (id) => {
+  return request({
+    url: `/knowledge/article/${id}`,
+    method: "get",
+  })
+}
+//文章新增
+//data为文章数据，包含标题、内容、分类、摘要、标签等
+export const knowledgeArticleAPI = (data) => {
+  return request({
+    url: "/knowledge/article",
+    method: "post",
+    data,
+  })
+}
+//文章编辑/knowledge/article/{id}
+//data为文章数据，包含标题、内容、分类、摘要、标签等
+export const knowledgeArticleUpdateAPI = (id, data) => {
+  return request({
+    url: `/knowledge/article/${id}`,
+    method: "put",
+    data,
+  })
+}
+// 发布/下线知识文章
+export const publishKnowledgeArticleAPI = (id, status) => {
+  return request({
+    url: `/knowledge/article/${id}/status`,
+    method: "put",
+    data: {
+      status,
+    }
+  })
+}
+// 删除知识文章
+export const deleteKnowledgeArticleAPI = (id) => {
+  return request({
+    url: `/knowledge/article/${id}`,
+    method: "delete",
   })
 }
