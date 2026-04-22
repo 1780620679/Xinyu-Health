@@ -5,6 +5,7 @@ import AuthLayout from "@/components/AuthLayout.vue"
 const BackRoutes = [
   {
     path: "/back",
+    redirect: "/back/dashboard",
     component: BackStageLayout,
     children: [
       {
@@ -71,6 +72,33 @@ const BackRoutes = [
 const router = createRouter({
   history: createWebHistory(),
   routes: BackRoutes,
+})
+
+// 全局路由守卫
+router.beforeEach((to, from, next) => {
+  // 检查用户是否已登录
+  const token = localStorage.getItem("token")
+  if (token) {
+    const userInfo = localStorage.getItem("userInfo")
+    if (userInfo.userType == 2) {//如果是后台路由
+      if (to.path.startsWith("/back")) {
+        next()
+      } else {
+        next('/back/dashboard')
+      }
+    } else if(userInfo.userType == 1) {//如果是前台
+      
+    }
+   
+  } else {
+    // 如果用户已登录,判断是否是后台路由
+    if (to.path.startsWith("/back")) {
+      //如果是后台路由，重定向到登录页
+      next('/auth/login')
+    } else {
+      next()
+    }
+  }
 })
 
 // 导出路由实例
