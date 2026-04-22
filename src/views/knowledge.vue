@@ -15,59 +15,23 @@
           categoryMap[scope.row.categoryId]
         }}</template>
       </el-table-column>
-      <el-table-column
-        label="作者"
-        width="150"
-        prop="authorName"
-      ></el-table-column>
-      <el-table-column
-        label="阅读量"
-        width="150"
-        prop="readCount"
-      ></el-table-column>
-      <el-table-column
-        label="发布时间"
-        width="150"
-        prop="publishedAt"
-      ></el-table-column>
+      <el-table-column label="作者" width="150" prop="authorName"></el-table-column>
+      <el-table-column label="阅读量" width="150" prop="readCount"></el-table-column>
+      <el-table-column label="发布时间" width="150" prop="publishedAt"></el-table-column>
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
           <el-button text type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button
-            text
-            type="success"
-            @click="handlePublish(scope.row)"
-            v-if="scope.row.status === 0 || scope.row.status === 2"
-            >发布</el-button
-          >
-          <el-button 
-          text 
-          type="warning"
-          @click="handleOffline(scope.row)"
-           v-if="scope.row.status === 1"
-            >下线</el-button
-          >
-          <el-button 
-          text 
-          type="danger"
-          @click="handleDelete(scope.row)"
-          >删除</el-button>
+          <el-button text type="success" @click="handlePublish(scope.row)"
+            v-if="scope.row.status === 0 || scope.row.status === 2">发布</el-button>
+          <el-button text type="warning" @click="handleOffline(scope.row)" v-if="scope.row.status === 1">下线</el-button>
+          <el-button text type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      background
-      :page-size="pagination.size"
-      layout="prev, pager, next"
-      :total="pagination.total"
-      @change="handleCurrentChange"
-    />
-    <ArticleDialog
-      v-model:modelValue="dialogVisible"
-      :categoryList="categoryList"
-      :currentArticle="currentArticle"
-      @success="handleSuccess"
-    ></ArticleDialog>
+    <el-pagination background :page-size="pagination.size" layout="prev, pager, next" :total="pagination.total"
+      @change="handleCurrentChange" />
+    <ArticleDialog v-model:modelValue="dialogVisible" :categoryList="categoryList" :currentArticle="currentArticle"
+      @success="handleSuccess"></ArticleDialog>
   </div>
 </template>
 <script setup>
@@ -123,7 +87,7 @@ const formItem = [
 // 分页配置
 const pagination = reactive({
   currentPage: 1,
-  size: 10,
+  size: 5,
   total: 0,
 })
 // 分页切换方法
@@ -166,62 +130,62 @@ const currentArticle = ref(null)
 // 新增/编辑
 const handleEdit = async (row) => {
   //判断是否是新增
-  if(!row.id){
-  //新增
-  currentArticle.value = null//新增时，清空当前文章详情，避免编辑时的默认值被覆盖
-  dialogVisible.value = true
-  }else{
-  //编辑
-  // 调用获取知识文章详情接口
-  const data = await getKnowledgeArticleDetailAPI(row.id)
-  currentArticle.value = data
-  dialogVisible.value = true
+  if (!row.id) {
+    //新增
+    currentArticle.value = null//新增时，清空当前文章详情，避免编辑时的默认值被覆盖
+    dialogVisible.value = true
+  } else {
+    //编辑
+    // 调用获取知识文章详情接口
+    const data = await getKnowledgeArticleDetailAPI(row.id)
+    currentArticle.value = data
+    dialogVisible.value = true
   }
 }
 // 发布
 const handlePublish = async (row) => {
- ElMessageBox.confirm("确认发布吗？", "提示", {
-  confirmButtonText: "确定",
-  cancelButtonText: "取消",
-  type: "info",
- }).then(async () => {
-  // 调用发布接口
-  await publishKnowledgeArticleAPI(row.id, 1)
-  //成功提示
-  ElMessage.success("发布成功")
-  // 刷新表格数据
-  handleSearch({})
- })
+  ElMessageBox.confirm("确认发布吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "info",
+  }).then(async () => {
+    // 调用发布接口
+    await publishKnowledgeArticleAPI(row.id, 1)
+    //成功提示
+    ElMessage.success("发布成功")
+    // 刷新表格数据
+    handleSearch({})
+  })
 }
 // 下线
 const handleOffline = async (row) => {
- ElMessageBox.confirm("确认下线吗？", "提示", {
-  confirmButtonText: "确定",
-  cancelButtonText: "取消",
-  type: "warning",
- }).then(async () => {
-  // 调用下线接口
-  await publishKnowledgeArticleAPI(row.id, 2)
-  //成功提示
-  ElMessage.success("下线成功")
-  // 刷新表格数据
-  handleSearch({})
- })
+  ElMessageBox.confirm("确认下线吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(async () => {
+    // 调用下线接口
+    await publishKnowledgeArticleAPI(row.id, 2)
+    //成功提示
+    ElMessage.success("下线成功")
+    // 刷新表格数据
+    handleSearch({})
+  })
 }
 // 删除
 const handleDelete = async (row) => {
- ElMessageBox.confirm("确认删除吗？", "提示", {
-  confirmButtonText: "确定",
-  cancelButtonText: "取消",
-  type: "danger",
- }).then(async () => {
-  // 调用删除接口
-  await deleteKnowledgeArticleAPI(row.id)
-  //成功提示
-  ElMessage.success("删除成功")
-  // 刷新表格数据
-  handleSearch({})
- })
+  ElMessageBox.confirm("确认删除吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "danger",
+  }).then(async () => {
+    // 调用删除接口
+    await deleteKnowledgeArticleAPI(row.id)
+    //成功提示
+    ElMessage.success("删除成功")
+    // 刷新表格数据
+    handleSearch({})
+  })
 }
 // 操作成功方法(子传父回调来的数据)
 const handleSuccess = () => {

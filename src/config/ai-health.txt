@@ -27,3 +27,17 @@
 5.携带token注意！！！config.headers['Authorization'] = `Bearer ${token}`等价于config.headers['token'] = token
 - 如果后端期望在 token （自定义的） 字段中获取 token，我们就应该使用 config.headers['token'] = token
 - 如果后端期望在 Authorization （标准的） 字段中获取 token，我们就应该使用 config.headers['Authorization'] = Bearer ${token}``
+
+6.emotional.vue里使用了各个状态对应的映射，注意一下映射这一块
+  这个的界面的详情页里用到的各种el-XXX多看看
+  el-avatar（头像）  el-rate（评分组件⭐）  el-descriptions（描述组件，设置column后会根据item数量自动换行） el-tag（标签组件） el-progress（进度条组件） el-card（卡片组件）
+
+7.模板渲染数据时，要注意对于后端返回的数据如data 对于data.XXX可能是unidentified，所以data.xxx.xxx就会报错，要么用可选符?. 要么直接对模板使用v-if=“data.xxx”
+
+
+8.eCharts图标  1.npm下载 2. import 导包 3.ref实例绑定上对应要渲染的地方div盒子等（（（ 4. init方法初始化创建echarts实例 5.定义图标的配置项options 6.调用图表实例setOption方法给图表设置配置项 ））） 7.界面创建调用逻辑初始化即可
+### 技术要点
+1. 响应式设计 ：  - 图表大小会根据容器自动调整 - 可以通过 grid 配置适应不同屏幕尺寸
+2. 性能优化 ：- 销毁旧实例再创建新实例，避免内存泄漏- 数据变化时重新设置配置项，实现图表刷新
+3. 交互体验 ：- 鼠标悬停时显示详细数据- 图例点击可显示/隐藏对应系列
+
