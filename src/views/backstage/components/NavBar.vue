@@ -53,7 +53,7 @@ const handleCommand = async (command) => {
       await LogoutAPI()
       ElMessage.success("退出登录成功")
       // 清除登录信息
-      AdminStore.clearLoginInfo()
+      AdminStore.clearUser()
       router.push("/auth/login")
     })
   }

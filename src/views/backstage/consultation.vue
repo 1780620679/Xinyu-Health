@@ -66,8 +66,9 @@
 </template>
 <script setup>
 import { getConsultationDataAPI, getSessionMessagesAPI } from '@/apis/consultation';
-import PageHead from '@/components/PageHead.vue';
+
 import { onMounted, ref } from 'vue';
+import PageHead from './components/PageHead.vue';
 
 // 表格数据
 const tableData = ref([])

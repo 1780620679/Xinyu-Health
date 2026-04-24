@@ -35,9 +35,6 @@
   </div>
 </template>
 <script setup>
-import PageHead from "@/components/PageHead.vue"
-import TableSearch from "@/components/TableSearch.vue"
-import ArticleDialog from "@/components/ArticleDialog.vue"
 import {
   deleteKnowledgeArticleAPI,
   getCategoryTreeAPI,
@@ -47,6 +44,9 @@ import {
 } from "@/apis/knowledge"
 import { onMounted, ref, reactive } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
+import ArticleDialog from "@/components/ArticleDialog.vue"
+import TableSearch from "@/components/TableSearch.vue"
+import PageHead from "./components/PageHead.vue"
 // 引入弹窗状态
 const dialogVisible = ref(false)
 // 搜索表单配置

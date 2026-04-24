@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router"
-import BackStageLayout from "@/components/BackStageLayout.vue"
-import AuthLayout from "@/components/AuthLayout.vue"
+import AuthLayout from "@/views/login/components/AuthLayout.vue"
 import { useAdminStore } from "@/stores/admin"
+import FrontStageLayout from "@/views/frontstage/FrontStageLayout.vue"
+import BackStageLayout from "@/views/backstage/BackStageLayout.vue"
+
 // 后台路由
 const BackRoutes = [
   {
@@ -12,7 +14,7 @@ const BackRoutes = [
       {
         // 数据分析路由
         path: "dashboard",
-        component: () => import("@/views/dashboard.vue"),
+        component: () => import("@/views/backstage/dashboard.vue"),
         //meta对象，用于配置路由的元数据，如标题、图标等，可以在AsideBar.vue中使用meta.title和meta.icon显示
         meta: {
           title: "数据分析",
@@ -22,7 +24,7 @@ const BackRoutes = [
       {
         //知识文章路由
         path: "knowledge",
-        component: () => import("@/views/knowledge.vue"),
+        component: () => import("@/views/backstage/knowledge.vue"),
         meta: {
           title: "知识文章",
           icon: "ChatLineSquare",
@@ -31,7 +33,7 @@ const BackRoutes = [
       {
         //咨询记录路由
         path: "consultation",
-        component: () => import("@/views/consultation.vue"),
+        component: () => import("@/views/backstage/consultation.vue"),
         meta: {
           title: "咨询记录",
           icon: "Message",
@@ -40,7 +42,7 @@ const BackRoutes = [
       {
         //情绪日志路由
         path: "emotional",
-        component: () => import("@/views/emotional.vue"),
+        component: () => import("@/views/backstage/emotional.vue"),
         meta: {
           title: "情绪日志",
           icon: "User",
@@ -54,14 +56,14 @@ const BackRoutes = [
     children: [
       {
         path: "login",
-        component: () => import("@/views/login.vue"),
+        component: () => import("@/views/login/login.vue"),
         meta: {
           title: "登录",
         },
       },
       {
         path: "register",
-        component: () => import("@/views/register.vue"),
+        component: () => import("@/views/login/register.vue"),
         meta: {
           title: "注册",
         },
@@ -69,10 +71,37 @@ const BackRoutes = [
     ],
   },
 ]
+// 前台路由
+const FrontRoutes = [
+  {
+    path: "/",
+    component: FrontStageLayout,
+    children: [
+      {
+        path: "",
+        component: () => import("@/views/frontstage/home.vue"),
+      },
+      {
+        path: "consultation",
+        component: () => import("@/views/frontstage/consultation.vue"),
+      },
+      {
+        path: "emotion-diary",
+        component: () => import("@/views/frontstage/emotionDiary.vue"),
+      },
+      {
+        path: "knowledge",
+        component: () => import("@/views/frontstage/knowledge.vue"),
+      },
+    ],
+  },
+]
+
+
 // 创建路由实例
 const router = createRouter({
   history: createWebHistory(),
-  routes: BackRoutes,
+  routes: [...BackRoutes, ...FrontRoutes],
 })
 
 
@@ -90,7 +119,12 @@ router.beforeEach((to, from, next) => {
         next('/back/dashboard')
       }
     } else if(userInfo.userType == 1) {//如果是前台
-      
+      //用户端账号只能访问前台路由
+      if (to.path.startsWith("/back")||to.path.startsWith("/auth")) {
+        next('/')
+      } else {
+        next()
+      }
     }
    
   } else {

@@ -15,3 +15,11 @@ export const LogoutAPI = () => {
     method: "post",
   })
 }
+// 注册接口
+export const RegisterAPI = (data) => {
+  return request({
+    url: "/user/add",
+    method: "post",
+    data,
+  })
+}

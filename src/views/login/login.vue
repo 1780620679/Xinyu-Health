@@ -37,7 +37,7 @@ import { useRouter } from "vue-router"
 
 const ruleFormRef = ref(null)
 const formData = ref({
-  username: "admin",
+  username: "xiaohao",
   password: "123456",
 })
 const rules = ref({
@@ -64,11 +64,10 @@ const submitForm = async () => {
     if (res.userInfo.userType === 2) {
       // 后台端
       router.push("/back/dashboard")
+    } else {
+      // 用户端，跳转到首页即可
+      router.push("/")
     }
-    // else{
-    //   // 用户端
-    //   router.push("/user")
-    // }
   })
 }
 </script>

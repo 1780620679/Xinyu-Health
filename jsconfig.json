@@ -9,3 +9,4 @@
 //自己新建的jsconfig.json文件，用于配置js的编译选项
 //鼠标放在组件上，点击ctrl+click，即可跳转到组件的定义处
 //而且组件和路由变绿了，舒服
+//因为配置了路径别名，所以组件的路径是@/views/backstage/knowledge.vue

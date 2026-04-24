@@ -131,11 +131,12 @@
   </div>
 </template>
 <script setup>
-import PageHead from '@/components/PageHead.vue';
-import TableSearch from '@/components/TableSearch.vue';
+
 import { getEmotionalPageAPI, deleteEmotionalAPI } from '@/apis/emotional';
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import PageHead from './components/PageHead.vue';
+import TableSearch from '@/components/TableSearch.vue';
 
 // 状态映射
 const getEmotionTagType = (emotion) => {
