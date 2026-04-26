@@ -5,9 +5,9 @@
       <!-- AI助手信息 -->
       <div class="ai-assistant-info">
         <div class="breathing-circle">
-          <el-image :src="robotUrl" alt="AI助手" style="width: 25px; height: 25px;" />
+          <el-image :src="logoUrl" alt="AI助手" style="width: 60px; height: 60px; border-radius: 50%;" />
         </div>
-        <h3 class="assistant-name">AI助手</h3>
+        <h3 class="assistant-name">心屿</h3>
         <div class="online-status">
           <div class="status-dot"></div>
           在线服务中
@@ -120,7 +120,7 @@
             <el-image :src="likeUrl" alt="AI助手" style="width: 30px; height: 30px;" />
           </div>
           <div class="chat-info">
-            <h2>AI助手</h2>
+            <h2>心屿</h2>
             <p>您的专属心理咨询师</p>
           </div>
         </div>
@@ -137,11 +137,11 @@
         <!-- 默认欢迎用语 -->
         <div class="message-item ai-message" v-if="messages.length === 0">
           <div class="message-avatar">
-            <el-image :src="robotUrl" alt="AI助手" style="width: 18px; height: 18px;" />
+            <el-image :src="logoUrl" alt="AI助手" style="width: 32px; height: 32px; border-radius: 50%;" />
           </div>
           <div class="message-content">
             <div class="message-bubble">
-              <p>你好，欢迎来到AI助手，我是您的专属心理咨询师，我可以帮助您处理您的情绪和问题，以及为您提供专业的心理咨询，快开始对话吧！</p>
+              <p>你好，欢迎来到心屿，我是您的专属心理咨询师，我可以帮助您处理您的情绪和问题，以及为您提供专业的心理咨询，快开始对话吧！</p>
             </div>
             <div class="message-time">
               刚刚
@@ -153,7 +153,7 @@
           :class="msg.senderType === 1 ? 'user-message' : 'ai-message'">
           <div class="message-avatar">
             <el-image v-if="msg.senderType === 1" :src="userUrl" alt="用户" style="width: 18px; height: 18px;" />
-            <el-image v-if="msg.senderType === 2" :src="robotUrl" alt="AI助手" style="width: 18px; height: 18px;" />
+            <el-image v-if="msg.senderType === 2" :src="logoUrl" alt="AI助手" style="width: 18px; height: 18px;" />
           </div>
           <div class="message-content">
             <div class="message-bubble">
@@ -209,7 +209,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useAdminStore } from '@/stores/admin';
 
 // 图标
-const robotUrl = new URL('@/assets/images/robot-fill.png', import.meta.url).href
+const logoUrl = new URL('@/assets/images/心屿.png', import.meta.url).href
 const likeUrl = new URL('@/assets/images/like.png', import.meta.url).href
 const userUrl = new URL('@/assets/images/users.png', import.meta.url).href
 
@@ -264,6 +264,8 @@ const getEmotionAnalysis = async (sessionId) => {
   // console.log(res, '情绪分析结果');
   //更新情绪花园数据
   currentEmotion.value = res
+  // 加载完成后，隐藏骨架屏
+  skeletonLoading.value = false
 }
 
 
@@ -528,23 +530,21 @@ onMounted(() => {
       .breathing-circle {
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%);
-        // background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
+        background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 12px;
         animation: breathing 4s ease-in-out infinite;
-        box-shadow: 0 6px 24px rgba(251, 146, 60, 0.25);
+        box-shadow: 0 6px 24px rgba(255, 154, 86, 0.25);
         position: relative;
       }
 
       .assistant-name {
         font-size: 16px;
         font-weight: 700;
-        background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%);
-        // background: linear-gradient(135deg, #fb923c, #f59e0b);
+        background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
@@ -930,8 +930,7 @@ onMounted(() => {
     flex: 1;
 
     .chat-header {
-      background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%);
-      // background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
+      background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
       color: white;
       padding: 20px 24px;
       display: flex;
@@ -1004,9 +1003,8 @@ onMounted(() => {
 
         &.ai-message {
           .message-avatar {
-            background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%);
-            // background: linear-gradient(135deg, #fb923c, #f59e0b);
-            box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+            background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
+            box-shadow: 0 4px 12px rgba(255, 154, 86, 0.3);
           }
         }
 
@@ -1101,10 +1099,9 @@ onMounted(() => {
         height: 60px;
         width: 60px;
         border-radius: 16px;
-        background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%) !important;
-        // background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%) !important;
+        background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%) !important;
         border: none !important;
-        box-shadow: 0 6px 20px rgba(251, 146, 60, 0.25);
+        box-shadow: 0 6px 20px rgba(255, 154, 86, 0.25);
         transition: all 0.3s ease;
       }
 

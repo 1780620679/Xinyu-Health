@@ -1,0 +1,766 @@
+/* 暗黑模式全局样式 */
+
+/* 前台布局 */
+html.dark .frontend-layout {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .frontend-layout .navbar-container {
+  background-color: #2d2d2d !important;
+}
+
+html.dark .frontend-layout .navbar-container .brand-name {
+  color: #e0e0e0 !important;
+}
+
+html.dark .frontend-layout .navbar-container .nav-link {
+  color: #b0b0b0 !important;
+}
+
+html.dark .frontend-layout .navbar-container .nav-link:hover {
+  color: #6cb6ff !important;
+}
+
+html.dark .frontend-layout .footer-container {
+  background: #1a1a1a !important;
+}
+
+/* 后台布局 */
+html.dark .nav-bar {
+  background: #2d2d2d !important;
+  border-bottom-color: #404040 !important;
+}
+
+html.dark .nav-bar .page-title {
+  color: #e0e0e0 !important;
+}
+
+html.dark .nav-bar .user-name {
+  color: #e0e0e0 !important;
+}
+
+/* 后台侧边栏 */
+html.dark .menu-style {
+  background-color: #2d2d2d !important;
+  border-right: 1px solid #404040 !important;
+}
+
+html.dark .menu-style .brand {
+  background-color: #2d2d2d !important;
+  border-bottom: 1px solid #404040 !important;
+}
+
+html.dark .menu-style .brand .brand-title {
+  color: #e5e7eb !important;
+}
+
+html.dark .menu-style .brand .brand-subtitle {
+  color: #9ca3af !important;
+}
+
+html.dark .el-menu {
+  background-color: #2d2d2d !important;
+  border-right: 1px solid #404040 !important;
+}
+
+html.dark .el-menu-item {
+  color: #e5e7eb !important;
+  background-color: #2d2d2d !important;
+}
+
+html.dark .el-menu-item:hover {
+  color: #6cb6ff !important;
+  background-color: #374151 !important;
+}
+
+html.dark .el-menu-item.is-active {
+  color: #6cb6ff !important;
+  background-color: #1e3a8a !important;
+}
+
+html.dark .el-menu-item.is-active:hover {
+  color: #6cb6ff !important;
+  background-color: #1e3a8a !important;
+}
+
+/* 通用背景和文字颜色 */
+html.dark body {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark #app {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+/* Element Plus 组件暗黑模式适配 */
+html.dark .el-table {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  --el-table-border-color: #404040 !important;
+}
+
+html.dark .el-table th {
+  background-color: #383838 !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-table tr {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-table--striped .el-table__body tr.el-table__row--striped td {
+  background: #383838 !important;
+}
+
+html.dark .el-table__empty-text {
+  color: #909399 !important;
+}
+
+html.dark .el-pagination {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-pagination button {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-pagination .el-pager li {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-pagination .el-pager li:hover {
+  color: #6cb6ff !important;
+}
+
+html.dark .el-card {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  --el-card-border-color: #404040 !important;
+}
+
+html.dark .el-dialog {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-dialog__title {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-input__wrapper {
+  background-color: #383838 !important;
+  box-shadow: 0 0 0 1px #404040 inset !important;
+}
+
+html.dark .el-input__inner {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-input__inner::placeholder {
+  color: #909399 !important;
+}
+
+html.dark .el-form-item__label {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-form-item__label::before {
+  color: #909399 !important;
+}
+
+html.dark .el-dropdown-menu {
+  background-color: #2d2d2d !important;
+  border-color: #404040 !important;
+}
+
+html.dark .el-dropdown-menu__item {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-dropdown-menu__item:hover {
+  background-color: #383838 !important;
+}
+
+html.dark .el-button {
+  --el-button-bg-color: #383838 !important;
+  --el-button-border-color: #404040 !important;
+  --el-button-text-color: #e0e0e0 !important;
+}
+
+html.dark .el-button:hover {
+  --el-button-hover-bg-color: #404040 !important;
+  --el-button-hover-border-color: #6cb6ff !important;
+  --el-button-hover-text-color: #6cb6ff !important;
+}
+
+html.dark .el-button--primary {
+  --el-button-bg-color: #409eff !important;
+  --el-button-border-color: #409eff !important;
+  --el-button-text-color: #fff !important;
+}
+
+html.dark .el-tag {
+  --el-tag-bg-color: #383838 !important;
+  --el-tag-border-color: #404040 !important;
+  --el-tag-text-color: #e0e0e0 !important;
+}
+
+html.dark .el-select-dropdown {
+  background-color: #2d2d2d !important;
+  border-color: #404040 !important;
+}
+
+html.dark .el-select-dropdown__item {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-select-dropdown__item:hover {
+  background-color: #383838 !important;
+}
+
+html.dark .el-select-dropdown__item.selected {
+  color: #409eff !important;
+}
+
+html.dark .el-message-box {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-message-box__title {
+  color: #e0e0e0 !important;
+}
+
+html.dark .el-message-box__content {
+  color: #e0e0e0 !important;
+}
+
+/* 覆盖页面内容区域背景 */
+html.dark .main-content,
+html.dark .content-container,
+html.dark .page-content {
+  background-color: #1a1a1a !important;
+}
+
+/* 覆盖各个页面的背景 */
+html.dark .knowledge-container,
+html.dark .consultation-container,
+html.dark .emotionDiary-container,
+html.dark .home-container,
+html.dark .dashboard-container,
+html.dark .articleDetail-container {
+  background-color: #1a1a1a !important;
+}
+
+/* 覆盖页面卡片背景 */
+html.dark .diary-card,
+html.dark .article-item,
+html.dark .recommend-section,
+html.dark .article-list,
+html.dark .session-item,
+html.dark .session-history,
+html.dark .chat-messages,
+html.dark .chat-header {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #404040 !important;
+}
+
+/* 覆盖文字颜色 */
+html.dark .title,
+html.dark .section-title,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6,
+html.dark p,
+html.dark span {
+  color: #e0e0e0 !important;
+}
+
+/* 覆盖链接颜色 */
+html.dark a {
+  color: #6cb6ff !important;
+}
+
+html.dark a:hover {
+  color: #409eff !important;
+}
+
+/* Consultation 页面暗黑模式 */
+html.dark .consultation-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .consultation-container .sidebar {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .consultation-container .ai-assistant-info {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.9) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+  border: 1px solid rgba(64, 64, 64, 0.3) !important;
+}
+
+html.dark .consultation-container .assistant-name {
+  background: linear-gradient(135deg, #3cfbb4 0%, #0b73f5 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+html.dark .consultation-container .online-status {
+  color: #34d399 !important;
+}
+
+html.dark .consultation-container .status-dot {
+  background: #34d399 !important;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.4) !important;
+}
+
+html.dark .consultation-container .emotion-garden {
+  background: linear-gradient(135deg, #1e1e1e 0%, #252525 50%, #2a2a2a 100%) !important;
+  border: 1px solid rgba(64, 64, 64, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .consultation-container .garden-title {
+  color: #d1d5db !important;
+}
+
+html.dark .consultation-container .emotion-info {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+  border: 2px solid rgba(64, 64, 64, 0.8) !important;
+  color: #e5e7eb !important;
+}
+
+html.dark .consultation-container .emotion-status-text .status-label {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .emotion-status-text .status-emotion {
+  background-color: #374151 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #4b5563 !important;
+}
+
+html.dark .consultation-container .intensity-text {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .warm-suggestion {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.95), rgba(40, 40, 40, 0.8)) !important;
+  border: 1px solid rgba(64, 64, 64, 0.6) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .consultation-container .suggestion-title {
+  color: #d1d5db !important;
+}
+
+html.dark .consultation-container .suggestion-text {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .actions-title {
+  color: #d1d5db !important;
+}
+
+html.dark .consultation-container .action-item {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.9), rgba(40, 40, 40, 0.7)) !important;
+  border: 1px solid rgba(64, 64, 64, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .consultation-container .action-text {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .risk-notice {
+  background: linear-gradient(135deg, #2d1d0f, #372410) !important;
+  border: 1px solid rgba(217, 119, 6, 0.3) !important;
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.15) !important;
+}
+
+html.dark .consultation-container .notice-title {
+  color: #fbbf24 !important;
+}
+
+html.dark .consultation-container .notice-text {
+  color: #fcd34d !important;
+}
+
+html.dark .consultation-container .session-history {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .consultation-container .session-item {
+  border: 2px solid transparent !important;
+}
+
+html.dark .consultation-container .session-item:hover {
+  background: #383838 !important;
+  border-color: #4b5563 !important;
+}
+
+html.dark .consultation-container .session-item.active {
+  background: #1e3a8a !important;
+  border-color: #3b82f6 !important;
+}
+
+html.dark .consultation-container .session-title {
+  color: #e5e7eb !important;
+}
+
+html.dark .consultation-container .session-time {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .session-preview {
+  color: #6b7280 !important;
+}
+
+html.dark .consultation-container .session-status span {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .chat-main {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.95) 0%, rgba(40, 40, 40, 0.98) 100%) !important;
+  border: 1px solid rgba(64, 64, 64, 0.3) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+html.dark .consultation-container .chat-header {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%) !important;
+  border-bottom: 1px solid #4b5563 !important;
+}
+
+html.dark .consultation-container .chat-avatar {
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .consultation-container .chat-messages {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.02) 0%, rgba(40, 40, 40, 0.05) 100%) !important;
+}
+
+html.dark .consultation-container .message-bubble {
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.9) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+  border: 1px solid rgba(64, 64, 64, 0.3) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  color: #e5e7eb !important;
+}
+
+html.dark .consultation-container .typing-dot {
+  background: #6b7280 !important;
+}
+
+html.dark .consultation-container .error-message {
+  background: linear-gradient(135deg, #451a1a 0%, #3a1a1a 100%) !important;
+  border: 1px solid #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+html.dark .consultation-container .message-time {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .chat-input {
+  border-top: 1px solid rgba(64, 64, 64, 0.3) !important;
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.5) 0%, rgba(40, 40, 40, 0.7) 100%) !important;
+}
+
+html.dark .consultation-container .input-footer {
+  color: #9ca3af !important;
+}
+
+html.dark .consultation-container .send-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Emotion Diary 页面暗黑模式 */
+html.dark .emotionDiary-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .emotionDiary-container .header-section {
+  background: linear-gradient(135deg, rgba(60, 60, 60, 0.87) 0%, rgba(80, 80, 80, 0.87) 100%) !important;
+}
+
+html.dark .emotionDiary-container .diary-card {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .emotionDiary-container .title {
+  color: #e5e7eb !important;
+}
+
+html.dark .emotionDiary-container p {
+  color: #9ca3af !important;
+}
+
+html.dark .emotionDiary-container .emotion-card {
+  background: #383838 !important;
+  border: 2px solid #4b5563 !important;
+}
+
+html.dark .emotionDiary-container .emotion-card.selected {
+  border-color: #3b82f6 !important;
+  background: #1e3a8a !important;
+}
+
+html.dark .emotionDiary-container .emotion-name {
+  color: #e5e7eb !important;
+}
+
+/* Knowledge 页面暗黑模式 */
+html.dark .knowledge-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .knowledge-container .header-section {
+  background: linear-gradient(135deg, rgba(60, 60, 60, 0.87) 0%, rgba(80, 80, 80, 0.87) 100%) !important;
+}
+
+html.dark .knowledge-container .recommend-section {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .knowledge-container .section-title {
+  color: #e5e7eb !important;
+}
+
+html.dark .knowledge-container .recommend-item {
+  border-left: 4px solid #3b82f6 !important;
+}
+
+html.dark .knowledge-container .recommend-item .read-count {
+  color: #9ca3af !important;
+}
+
+html.dark .knowledge-container .article-item {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .knowledge-container .article-item .title h3 {
+  color: #e5e7eb !important;
+}
+
+html.dark .knowledge-container .article-item .flex-box span {
+  color: #9ca3af !important;
+}
+
+/* Knowledge Article Detail 页面暗黑模式 */
+html.dark .articleDetail-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .articleDetail-container .header-section {
+  background: linear-gradient(135deg, rgba(60, 60, 60, 0.87) 0%, rgba(80, 80, 80, 0.87) 100%) !important;
+}
+
+html.dark .articleDetail-container .diary-card {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .articleDetail-container .title {
+  color: #e5e7eb !important;
+}
+
+html.dark .articleDetail-container .article-title {
+  color: #e5e7eb !important;
+}
+
+html.dark .articleDetail-container .flex-box span {
+  color: #9ca3af !important;
+}
+
+html.dark .articleDetail-container .content-wrapper {
+  color: #e5e7eb !important;
+}
+
+html.dark .articleDetail-container .content-wrapper :deep(p) {
+  color: #e5e7eb !important;
+}
+
+html.dark .articleDetail-container .content-wrapper :deep(h1),
+html.dark .articleDetail-container .content-wrapper :deep(h2),
+html.dark .articleDetail-container .content-wrapper :deep(h3),
+html.dark .articleDetail-container .content-wrapper :deep(h4),
+html.dark .articleDetail-container .content-wrapper :deep(h5),
+html.dark .articleDetail-container .content-wrapper :deep(h6) {
+  color: #e5e7eb !important;
+}
+
+html.dark .articleDetail-container .tags-title {
+  color: #e5e7eb !important;
+}
+
+/* Home 页面暗黑模式 */
+html.dark .home-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .home-container .hero-section {
+  background: linear-gradient(135deg, #1e3a8a 0%, #374151 100%) !important;
+}
+
+html.dark .home-container .hero-content h1 {
+  color: #e5e7eb !important;
+}
+
+html.dark .home-container .hero-content p {
+  color: #9ca3af !important;
+}
+
+html.dark .home-container .feature-card {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .home-container .feature-card h3 {
+  color: #e5e7eb !important;
+}
+
+html.dark .home-container .feature-card p {
+  color: #9ca3af !important;
+}
+
+/* Dashboard 页面暗黑模式 */
+html.dark .dashboard-container {
+  background-color: #1a1a1a !important;
+}
+
+html.dark .dashboard-container .dashboard-card {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .dashboard-container .dashboard-card h3 {
+  color: #e5e7eb !important;
+}
+
+html.dark .dashboard-container .dashboard-card .card-value {
+  color: #e5e7eb !important;
+}
+
+html.dark .dashboard-container .chart-container {
+  background: #2d2d2d !important;
+  border: 1px solid #404040 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+html.dark .dashboard-container .chart-title {
+  color: #e5e7eb !important;
+}
+
+/* 滚动条暗黑模式 */
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #2d2d2d !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563 !important;
+  border-radius: 4px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280 !important;
+}
+
+/* 确保所有输入框文本颜色正确 */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有按钮文本颜色正确 */
+html.dark button {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有链接颜色正确 */
+html.dark a {
+  color: #6cb6ff !important;
+}
+
+/* 确保所有表格文本颜色正确 */
+html.dark table {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有列表文本颜色正确 */
+html.dark ul,
+html.dark ol {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有引用文本颜色正确 */
+html.dark blockquote {
+  color: #9ca3af !important;
+  border-left: 4px solid #4b5563 !important;
+}
+
+/* 确保所有代码块文本颜色正确 */
+html.dark code {
+  background-color: #383838 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #4b5563 !important;
+}
+
+/* 确保所有预格式化文本颜色正确 */
+html.dark pre {
+  background-color: #383838 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #4b5563 !important;
+}
+
+/* 确保所有标题颜色正确 */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有段落文本颜色正确 */
+html.dark p {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有 span 文本颜色正确 */
+html.dark span {
+  color: #e5e7eb !important;
+}
+
+/* 确保所有 div 文本颜色正确 */
+html.dark div {
+  color: #e5e7eb !important;
+}

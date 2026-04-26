@@ -1,58 +1,54 @@
 <template>
   <div class="articleDetail-container">
-    <!-- 头部 -->
-    <div class="header-section">
+    <div class="page-header">
       <div class="header-content">
-        <el-image :src="bookUrl" style="width: 60px; height: 60px;" />
-        <h1>文章详情</h1>
+        <div class="header-icon">
+          <el-image :src="bookUrl" style="width: 50px; height: 50px;" />
+        </div>
+        <div class="header-text">
+          <h1>文章详情</h1>
+          <p>阅读专业的心理健康知识</p>
+        </div>
       </div>
     </div>
-    <!-- 内容 -->
+
     <div class="content">
-      <!-- 标题的一些内容 -->
-      <div class="diary-card">
-        <!-- 标题 -->
-        <p class="title">文章信息</p>
-        <!-- 子标题 -->
-        <div class="sub-title">
+      <div class="diary-card article-info-card">
+        <div class="article-header">
           <el-tag class="category-tag" type="primary" plain size="large">{{ articleDetail.categoryName }}</el-tag>
-          <div class="flex-box">
-            <el-icon>
-              <List />
-            </el-icon>
-            <span>{{ dayjs(articleDetail.updateAt).format('YYYY-MM-DD') }}</span>
+          <div class="article-date">
+            <el-icon><List /></el-icon>
+            {{ dayjs(articleDetail.updateAt).format('YYYY-MM-DD') }}
           </div>
         </div>
-        <!-- 文章标题 -->
         <h1 class="article-title">{{ articleDetail.title }}</h1>
         <div class="summary-content" v-if="articleDetail.summary">
+          <div class="summary-icon">💡</div>
           <p>{{ articleDetail.summary }}</p>
         </div>
-        <!-- 作者和阅读量 -->
-        <div class="flex-box" style="margin-top: 20px;">
-          <div class="flex-box item">
-            <el-icon>
-              <Avatar />
-            </el-icon>
-            <span>{{ articleDetail.authorName }}</span>
+        <div class="article-meta">
+          <div class="meta-item">
+            <el-icon><Avatar /></el-icon>
+            {{ articleDetail.authorName }}
           </div>
-          <div class="flex-box item">
-            <el-icon>
-              <Platform />
-            </el-icon>
-            <span>{{ articleDetail.readCount }}次阅读</span>
+          <div class="meta-item">
+            <el-icon><Platform /></el-icon>
+            {{ articleDetail.readCount }}次阅读
           </div>
         </div>
       </div>
-      <!-- 正文的内容 -->
-      <div class="diary-card">
-        <!-- 标题 -->
-        <div class="title">文章内容</div>
-        <!-- 文章内容 -->
+
+      <div class="diary-card article-content-card">
+        <div class="content-header">
+          <span class="content-icon">📖</span>
+          <span class="content-title">文章内容</span>
+        </div>
         <div class="content-wrapper" v-html="formatContent(articleDetail.content)"></div>
-        <!-- 标签 -->
         <div class="tags-content" v-if="articleDetail.tagArray && articleDetail.tagArray.length > 0">
-          <h4 class="tags-title">相关标签</h4>
+          <div class="tags-header">
+            <span class="tags-icon">🏷️</span>
+            <span class="tags-title">相关标签</span>
+          </div>
           <div class="tags-list">
             <el-tag v-for="tag in articleDetail.tagArray" :key="tag" type="info" class="tag-item">{{ tag }}</el-tag>
           </div>
@@ -99,85 +95,206 @@ onMounted(() => {
 </script>
 <style scoped lang="scss">
 .articleDetail-container {
-  background: linear-gradient(135deg, #fafbfc 0%, #f7f9fc 50%, #f2f6fa 100%);
+  background: linear-gradient(180deg, #FFF9F5 0%, #FFF5F0 100%);
+  min-height: calc(100vh - 70px);
+  padding-bottom: 60px;
 
-  .flex-box {
-    display: flex;
-    align-items: center;
-
-    .item {
-      margin-right: 20px;
-
-      span {
-        margin-left: 5px;
-      }
-    }
+  html.dark & {
+    background: linear-gradient(180deg, #1a1a1a 0%, #252525 100%);
   }
 
-  .header-section {
-    background: linear-gradient(135deg, rgb(11 245 100 / 87%) 0%, #f6b75cf7 100%);
-    // background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 100%);
-    color: white;
-    padding: 48px;
+  .page-header {
+    background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
+    padding: 50px 40px;
 
     .header-content {
+      max-width: 980px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 20px;
+
+      .header-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .header-text {
+        h1 {
+          font-size: 36px;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px;
+          font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        p {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-family: 'Microsoft YaHei', sans-serif;
+        }
+      }
     }
   }
 
   .content {
+    max-width: 980px;
     margin: 0 auto;
-    width: 980px;
-    padding: 20px;
+    padding: 30px 20px;
 
     .diary-card {
-      margin-bottom: 20px;
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(255, 107, 107, 0.06);
+      border: 1px solid rgba(255, 107, 107, 0.08);
 
-      .title {
-        margin-bottom: 15px;
-        font-size: 20px;
-        font-weight: 600;
-        color: #374151;
+      html.dark & {
+        background: #2d2d2d;
       }
+    }
 
-      .sub-title {
-        margin-top: 20px;
+    .article-info-card {
+      .article-header {
         display: flex;
         align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
 
         .category-tag {
-          margin-right: 20px;
+          border-radius: 20px;
+        }
+
+        .article-date {
+          font-size: 14px;
+          color: #888;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          html.dark & {
+            color: #999;
+          }
         }
       }
 
       .article-title {
-        font-size: 28px;
-        font-weight: bold;
-        color: #111827;
-        margin-top: 30px;
-        margin-bottom: 10px;
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 24px;
+        line-height: 1.3;
+        font-family: 'Microsoft YaHei', sans-serif;
+
+        html.dark & {
+          color: #fff;
+        }
       }
 
       .summary-content {
-        background: rgba(126, 211, 33, 0.1);
-        border-left: 4px solid #7ED321;
-        padding: 10px 15px;
-        border-radius: 0 8px 8px 0;
-        position: relative;
+        background: linear-gradient(135deg, #FFF5F0 0%, #FFF0EA 100%);
+        border-radius: 16px;
+        padding: 20px 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+
+        html.dark & {
+          background: linear-gradient(135deg, #3d3d3d 0%, #333 100%);
+        }
+
+        .summary-icon {
+          font-size: 24px;
+          flex-shrink: 0;
+        }
+
+        p {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #666;
+          margin: 0;
+          font-family: 'Microsoft YaHei', sans-serif;
+
+          html.dark & {
+            color: #aaa;
+          }
+        }
+      }
+
+      .article-meta {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #F0F0F0;
+
+        html.dark & {
+          border-top-color: #444;
+        }
+
+        .meta-item {
+          font-size: 14px;
+          color: #888;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          html.dark & {
+            color: #999;
+          }
+        }
+      }
+    }
+
+    .article-content-card {
+      .content-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #FFF5F0;
+
+        html.dark & {
+          border-bottom-color: #3d3d3d;
+        }
+
+        .content-icon {
+          font-size: 20px;
+        }
+
+        .content-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+          font-family: 'Microsoft YaHei', sans-serif;
+
+          html.dark & {
+            color: #fff;
+          }
+        }
       }
 
       .content-wrapper {
         font-size: 15px;
-        color: #374151;
+        line-height: 1.8;
+        color: #555;
+
+        html.dark & {
+          color: #bbb;
+        }
 
         :deep(p) {
-          margin-bottom: 10px;
+          margin-bottom: 16px;
         }
 
         :deep(h1),
@@ -186,48 +303,98 @@ onMounted(() => {
         :deep(h4),
         :deep(h5),
         :deep(h6) {
-          margin: 15px 0 10px;
-          color: #111827;
+          margin: 24px 0 12px;
+          color: #333;
           font-weight: 600;
+          font-family: 'Microsoft YaHei', sans-serif;
+
+          html.dark & {
+            color: #fff;
+          }
         }
 
         :deep(h2) {
-          font-size: 15px;
-          border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 5px;
+          font-size: 20px;
+          border-bottom: 2px solid #FFF5F0;
+          padding-bottom: 8px;
+
+          html.dark & {
+            border-bottom-color: #3d3d3d;
+          }
         }
 
         :deep(h3) {
-          font-size: 13px;
+          font-size: 18px;
         }
 
         :deep(ul),
         :deep(ol) {
-          padding-left: 15px;
-          margin-bottom: 10px;
+          padding-left: 24px;
+          margin-bottom: 16px;
         }
 
         :deep(li) {
-          margin-bottom: 5px;
+          margin-bottom: 8px;
+        }
+
+        :deep(strong) {
+          color: #FF6B6B;
+          font-weight: 600;
+        }
+
+        :deep(em) {
+          color: #FF9A56;
+          font-style: italic;
         }
       }
 
       .tags-content {
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px solid #e5e7eb;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #F0F0F0;
 
-        .tags-title {
-          margin-bottom: 10px;
-          font-size: 14px;
-          font-weight: 600;
-          color: #374151;
+        html.dark & {
+          border-top-color: #444;
+        }
+
+        .tags-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 16px;
+
+          .tags-icon {
+            font-size: 18px;
+          }
+
+          .tags-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Microsoft YaHei', sans-serif;
+
+            html.dark & {
+              color: #fff;
+            }
+          }
         }
 
         .tags-list {
           display: flex;
           flex-wrap: wrap;
           gap: 10px;
+
+          .tag-item {
+            border-radius: 16px;
+            padding: 6px 16px;
+            font-size: 13px;
+
+            html.dark & {
+              background: #3d3d3d;
+              border-color: #555;
+              color: #bbb;
+            }
+          }
         }
       }
     }

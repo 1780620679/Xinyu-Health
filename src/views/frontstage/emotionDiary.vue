@@ -1,78 +1,102 @@
 <template>
   <div class="emotionDiary-container">
-    <!-- 头部 -->
-    <div class="header-section">
+    <div class="page-header">
       <div class="header-content">
-        <el-image :src="likeUrl" style="width: 60px; height: 60px;" />
-        <h1>情绪日记</h1>
+        <div class="header-icon">
+          <el-image :src="heartUrl" style="width: 50px; height: 50px;" />
+        </div>
+        <div class="header-text">
+          <h1>情绪日记</h1>
+          <p>记录每一天的心情，感受成长的力量</p>
+        </div>
       </div>
     </div>
-    <!-- 内容 -->
+
     <div class="content">
-      <!-- 情绪评分 -->
       <div class="diary-card">
-        <div class="title">为自己打分</div>
-        <div class="section">
-          <p>请根据今日的情绪状态，给自己打分。</p>
+        <div class="card-header">
+          <span class="card-icon">📊</span>
+          <span class="card-title">为自己打分</span>
+        </div>
+        <div class="card-body">
+          <p class="card-hint">请根据今日的情绪状态，给自己打分。</p>
           <div class="rate">
             <el-rate v-model="diaryForm.moodScore" show-text :texts="emotionStatus" :max="10" size="large" />
           </div>
         </div>
       </div>
-      <!-- 主要情绪 -->
+
       <div class="diary-card">
-        <div class="title">主要情绪</div>
-        <div class="emotion-grid">
-          <div class="emotion-card" v-for="emotion in emotionOptions" :key="emotion.name"
-            @click="selectEmotion(emotion.name)" :class="{ 'selected': emotion.name == diaryForm.dominantEmotion }">
-            <el-image :src="emotion.url" style="width: 50px; height: 50px;" />
-            <div class="emotion-name">{{ emotion.name }}</div>
+        <div class="card-header">
+          <span class="card-icon">💝</span>
+          <span class="card-title">主要情绪</span>
+        </div>
+        <div class="card-body">
+          <div class="emotion-grid">
+            <div class="emotion-card" v-for="emotion in emotionOptions" :key="emotion.name"
+              @click="selectEmotion(emotion.name)" :class="{ 'selected': emotion.name == diaryForm.dominantEmotion }">
+              <el-image lazy :src="emotion.url" style="width: 50px; height: 50px;" />
+              <div class="emotion-name">{{ emotion.name }}</div>
+            </div>
           </div>
         </div>
       </div>
-      <!-- 详细记录 -->
+
       <div class="diary-card">
-        <div class="title">详细记录</div>
-        <div class="detail-form">
-          <!-- 情绪触发因素 -->
-          <div class="form-group">
-            <div class="form-label">情绪触发因素</div>
-            <el-input v-model="diaryForm.emotionTriggers" type="textarea" :rows="3" show-word-limit maxlength="1000"
-              placeholder="请输入情绪触发因素" />
-          </div>
-          <!-- 今日感想 -->
-          <div class="form-group">
-            <div class="form-label">今日感想</div>
-            <el-input v-model="diaryForm.diaryContent" type="textarea" :rows="5" show-word-limit maxlength="2000"
-              placeholder="请输入今日感想" />
-          </div>
-          <!-- 生活指标 -->
-          <div class="life-indicators">
-            <div class="indicator-group">
-              <div class="form-label">睡眠质量</div>
-              <el-select v-model="diaryForm.sleepQuality" placeholder="请选择睡眠质量">
-                <el-option label="很差" :value="1" />
-                <el-option label="较差" :value="2" />
-                <el-option label="一般" :value="3" />
-                <el-option label="良好" :value="4" />
-                <el-option label="优秀" :value="5" />
-              </el-select>
+        <div class="card-header">
+          <span class="card-icon">📝</span>
+          <span class="card-title">详细记录</span>
+        </div>
+        <div class="card-body">
+          <div class="detail-form">
+            <div class="form-group">
+              <div class="form-label">
+                <span class="label-icon">💭</span>
+                情绪触发因素
+              </div>
+              <el-input v-model="diaryForm.emotionTriggers" type="textarea" :rows="3" show-word-limit maxlength="1000"
+                placeholder="请输入情绪触发因素" />
             </div>
-            <div class="indicator-group">
-              <div class="form-label">压力水平</div>
-              <el-select v-model="diaryForm.stressLevel" placeholder="请选择压力水平">
-                <el-option label="很低" :value="1" />
-                <el-option label="较低" :value="2" />
-                <el-option label="中等" :value="3" />
-                <el-option label="较高" :value="4" />
-                <el-option label="很高" :value="5" />
-              </el-select>
+            <div class="form-group">
+              <div class="form-label">
+                <span class="label-icon">✨</span>
+                今日感想
+              </div>
+              <el-input v-model="diaryForm.diaryContent" type="textarea" :rows="5" show-word-limit maxlength="2000"
+                placeholder="请输入今日感想" />
             </div>
-          </div>
-          <!-- 提交按钮 -->
-          <div class="action-buttons">
-            <el-button @click="resetForm">重置</el-button>
-            <el-button type="primary" @click="submitForm">提交</el-button>
+            <div class="life-indicators">
+              <div class="indicator-group">
+                <div class="form-label">
+                  <span class="label-icon">🌙</span>
+                  睡眠质量
+                </div>
+                <el-select v-model="diaryForm.sleepQuality" placeholder="请选择睡眠质量">
+                  <el-option label="很差" :value="1" />
+                  <el-option label="较差" :value="2" />
+                  <el-option label="一般" :value="3" />
+                  <el-option label="良好" :value="4" />
+                  <el-option label="优秀" :value="5" />
+                </el-select>
+              </div>
+              <div class="indicator-group">
+                <div class="form-label">
+                  <span class="label-icon">📈</span>
+                  压力水平
+                </div>
+                <el-select v-model="diaryForm.stressLevel" placeholder="请选择压力水平">
+                  <el-option label="很低" :value="1" />
+                  <el-option label="较低" :value="2" />
+                  <el-option label="中等" :value="3" />
+                  <el-option label="较高" :value="4" />
+                  <el-option label="很高" :value="5" />
+                </el-select>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <el-button class="btn-reset" @click="resetForm">重置</el-button>
+              <el-button class="btn-submit" type="primary" @click="submitForm">提交日记</el-button>
+            </div>
           </div>
         </div>
       </div>
@@ -83,7 +107,7 @@
 import { ref } from 'vue'
 import { dayjs, ElMessage } from 'element-plus'
 import { createOrUpdateEmotionDiaryAPI } from '@/apis/frontend/emotionDiary'
-const likeUrl = new URL('@/assets/images/like.png', import.meta.url).href
+const heartUrl = new URL('@/assets/images/like.png', import.meta.url).href
 // 情绪状态
 const emotionStatus = ['绝望崩溃', '消沉抑郁', '焦虑烦躁', '低落不悦', '平静淡然', '轻松惬意', '愉悦舒心', '欢欣满足', '兴奋欣喜', '极致幸福']
 //情绪选项,从@/assets/images/里读取
@@ -137,101 +161,269 @@ const submitForm = async () => {
   // 重置表单
   resetForm()
 }
-
 </script>
 <style scoped lang="scss">
 .emotionDiary-container {
-  background: linear-gradient(135deg, #fafbfc 0%, #f7f9fc 50%, #f2f6fa 100%);
+  background: linear-gradient(180deg, #FFF9F5 0%, #FFF5F0 100%);
+  min-height: calc(100vh - 70px);
+  padding-bottom: 60px;
 
-  .header-section {
-    margin: 0 auto;
-    width: 881px;
-    background: linear-gradient(135deg, #d32158a3 0%, #f54323bf 100%);
-    // background: linear-gradient(135deg, #7ED321 0%, #F5A623 100%);
-    border-radius: 10px;
-    color: white;
-    padding: 48px;
+  html.dark & {
+    background: linear-gradient(180deg, #1a1a1a 0%, #252525 100%);
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
+    padding: 50px 40px;
 
     .header-content {
+      max-width: 980px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 20px;
+
+      .header-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .header-text {
+        h1 {
+          font-size: 36px;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px;
+          font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        p {
+          font-size: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-family: 'Microsoft YaHei', sans-serif;
+        }
+      }
     }
   }
 
   .content {
+    max-width: 980px;
     margin: 0 auto;
-    width: 980px;
-    padding: 20px;
+    padding: 30px 20px;
 
     .diary-card {
-      margin-bottom: 20px;
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(255, 107, 107, 0.06);
+      border: 1px solid rgba(255, 107, 107, 0.08);
 
-      .title {
-        margin-bottom: 20px;
-        font-size: 25px;
-        font-weight: 600;
-        color: #374151;
+      html.dark & {
+        background: #2d2d2d;
       }
 
-      .section {
-        margin-bottom: 20px;
-
-        p {
-          font-size: 15px;
-          color: #6B7280;
-          margin-bottom: 15px;
-        }
-      }
-
-      .emotion-grid {
+      .card-header {
         display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #FFF5F0;
 
-        .emotion-card {
-          padding: 15px;
-          border: 2px solid #E5E7EB;
-          border-radius: 15px;
-          text-align: center;
-          cursor: pointer;
-          background: #F9FAFB;
+        html.dark & {
+          border-bottom-color: #3d3d3d;
+        }
 
-          .emotion-name {
-            margin-top: 10px;
-            padding: 0 75px;
-            color: #374151;
-          }
+        .card-icon {
+          font-size: 24px;
+        }
 
-          &.selected {
-            border-color: #7ED321;
-            background: #F0FDF4;
-            transform: translateY(-3px);
+        .card-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+          font-family: 'Microsoft YaHei', sans-serif;
+
+          html.dark & {
+            color: #fff;
           }
         }
       }
 
-      .detail-form {
-        .form-label {
-          margin: 10px 0;
-          color: #374151;
-        }
+      .card-body {
+        .card-hint {
+          font-size: 15px;
+          color: #888;
+          margin: 0 0 20px;
+          font-family: 'Microsoft YaHei', sans-serif;
 
-        .life-indicators {
-          display: flex;
-          gap: 20px;
-
-          .indicator-group {
-            flex: 1;
+          html.dark & {
+            color: #999;
           }
         }
 
-        .action-buttons {
-          margin-top: 40px
+        .emotion-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+
+          .emotion-card {
+            padding: 20px 16px;
+            border: 2px solid #F0F0F0;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            background: #FAFAFA;
+            transition: all 0.3s ease;
+
+            html.dark & {
+              background: #333;
+              border-color: #444;
+            }
+
+            &:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 8px 25px rgba(255, 107, 107, 0.15);
+              border-color: #FF9A56;
+            }
+
+            .emotion-name {
+              margin-top: 10px;
+              font-size: 14px;
+              font-weight: 500;
+              color: #666;
+              font-family: 'Microsoft YaHei', sans-serif;
+
+              html.dark & {
+                color: #aaa;
+              }
+            }
+
+            &.selected {
+              border-color: #FF6B6B;
+              background: linear-gradient(135deg, #FFF5F0 0%, #FFE4D6 100%);
+              transform: translateY(-4px);
+              box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+
+              html.dark & {
+                background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
+              }
+
+              .emotion-name {
+                color: #FF6B6B;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+
+        .detail-form {
+          .form-label {
+            margin: 0 0 12px;
+            color: #555;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            html.dark & {
+              color: #aaa;
+            }
+
+            .label-icon {
+              font-size: 18px;
+            }
+          }
+
+          .form-group {
+            margin-bottom: 24px;
+          }
+
+          .life-indicators {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 30px;
+          }
+
+          .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding-top: 10px;
+
+            .btn-reset {
+              padding: 14px 40px;
+              border-radius: 50px;
+              font-size: 16px;
+              font-weight: 500;
+              font-family: 'Microsoft YaHei', sans-serif;
+              border: 2px solid #FF9A56;
+              color: #FF9A56;
+              background: transparent;
+              transition: all 0.3s ease;
+
+              &:hover {
+                background: #FFF5F0;
+                transform: translateY(-2px);
+              }
+
+              html.dark & {
+                border-color: #FFB4B4;
+                color: #FFB4B4;
+
+                &:hover {
+                  background: #3d3d3d;
+                }
+              }
+            }
+
+            .btn-submit {
+              padding: 14px 50px;
+              border-radius: 50px;
+              font-size: 16px;
+              font-weight: 600;
+              font-family: 'Microsoft YaHei', sans-serif;
+              background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
+              border: none;
+              transition: all 0.3s ease;
+
+              &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(255, 107, 107, 0.35);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .emotionDiary-container {
+    .content {
+      .diary-card {
+        .card-body {
+          .emotion-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .detail-form {
+            .life-indicators {
+              grid-template-columns: 1fr;
+            }
+          }
         }
       }
     }

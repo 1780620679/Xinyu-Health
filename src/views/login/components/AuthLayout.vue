@@ -25,7 +25,7 @@
 import { ref } from "vue"
 
 //获取图标路径(如果直接src="@/assets/images/robot-fill.png" 会报错 所以要使用new URL()方法)
-const iconUrl = new URL("@/assets/images/robot-fill.png", import.meta.url).href
+const iconUrl = new URL("@/assets/images/心屿.png", import.meta.url).href
 </script>
 
 <style scoped lang="scss">

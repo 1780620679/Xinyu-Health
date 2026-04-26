@@ -9,6 +9,9 @@
       <p class="page-title">{{ route.meta.title }}</p>
     </div>
     <div class="flex-box">
+      <!-- 主题切换 -->
+      <el-switch v-model="isDark" @change="handleThemeChange" inline-prompt active-icon="Moon" inactive-icon="Sunny"
+        style="--el-switch-on-color: #2c3e50; --el-switch-off-color: #f5a623; margin-right: 20px;" />
       <el-dropdown @command="handleCommand">
         <div class="flex-box">
           <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
@@ -34,10 +37,42 @@ import { LogoutAPI } from "@/apis/admin"
 import { useAdminStore } from "@/stores/admin"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRoute, useRouter } from "vue-router"
+import { ref, watch, onMounted } from "vue"
+
 const route = useRoute()
 const router = useRouter()
 // 引入admin store中的isCollapse状态,控制是否折叠侧边栏
 const AdminStore = useAdminStore()
+
+// 同步暗黑模式状态
+const isDark = ref(AdminStore.isDark)
+// 监听 store 中的主题变化
+watch(() => AdminStore.isDark, (newVal) => {
+  isDark.value = newVal
+})
+
+// 处理主题切换
+const handleThemeChange = (value) => {
+  AdminStore.isDark = value
+  // 应用主题到 html 元素
+  if (value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+
+onMounted(() => {
+  // 同步初始主题状态
+  isDark.value = AdminStore.isDark
+  // 应用初始主题
+  if (AdminStore.isDark) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+})
+
 const handleCollapse = () => {
   AdminStore.toggleCollapse()
 }

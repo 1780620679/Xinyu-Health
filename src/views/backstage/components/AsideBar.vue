@@ -30,7 +30,7 @@ const AdminStore = useAdminStore()
 const isCollapse = computed(() => AdminStore.isCollapse)
 
 // 图标URL
-const iconUrl = new URL("@/assets/images/机器人.png", import.meta.url).href
+const iconUrl = new URL("@/assets/images/心屿.png", import.meta.url).href
 
 // 点击菜单项时跳转路由
 const handleClick = (key) => {

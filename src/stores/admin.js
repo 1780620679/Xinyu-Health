@@ -9,6 +9,9 @@ export const useAdminStore = defineStore("ai-health-admin", () => {
     isCollapse.value = !isCollapse.value;
   };
 
+  // 主题状态 (false: 浅色模式, true: 暗黑模式)
+  const isDark = ref(false)
+
   const token = ref("")
   const userInfo = ref({})
   // 设置token,userInfo
@@ -23,7 +26,7 @@ export const useAdminStore = defineStore("ai-health-admin", () => {
     token.value = ""
     userInfo.value = {}
   }
-  
+
   return {
     isCollapse,
     toggleCollapse,
@@ -32,6 +35,7 @@ export const useAdminStore = defineStore("ai-health-admin", () => {
     setToken,
     setUserInfo,
     clearUser,
+    isDark,
   };
 },{
   persist: true,

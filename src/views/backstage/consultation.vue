@@ -1,6 +1,7 @@
 <template>
   <div>
     <PageHead title="咨询记录"></PageHead>
+    <!-- 咨询记录表格 -->
     <el-table :data="tableData" style="width: 100%;">
       <el-table-column label="会话ID" width="100">
         <template #default="scope">
@@ -22,8 +23,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页组件 -->
     <el-pagination background :page-size="pagination.size" layout="prev, pager, next" :total="pagination.total"
       @change="handleCurrentChange" />
+    <!-- 对话详情弹窗 -->
     <el-dialog title="会话详情" v-model="showDetailDialog" width="70%">
       <div class="session-detail">
         <div class="detail-header">
@@ -56,6 +59,7 @@
           </div>
         </div>
       </div>
+      <!-- 对话详情底部操作按钮 -->
       <template #footer>
         <el-button @click="showDetailDialog = false">
           关闭
@@ -66,9 +70,10 @@
 </template>
 <script setup>
 import { getConsultationDataAPI, getSessionMessagesAPI } from '@/apis/consultation';
-
 import { onMounted, ref } from 'vue';
 import PageHead from './components/PageHead.vue';
+import Skeleton from '@/components/Skeleton.vue';
+// 添加加载状态
 
 // 表格数据
 const tableData = ref([])
