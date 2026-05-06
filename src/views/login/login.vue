@@ -37,7 +37,7 @@ import { useRouter } from "vue-router"
 
 const ruleFormRef = ref(null)
 const formData = ref({
-  username: "xiaohao",
+  username: "admin",
   password: "123456",
 })
 const rules = ref({
