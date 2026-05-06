@@ -12,6 +12,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  base: '/vue-ai-project/',
   //解决跨域问题
   // 配置代理服务器
   server: {

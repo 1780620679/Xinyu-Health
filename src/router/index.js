@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHashHistory } from "vue-router"
 import AuthLayout from "@/views/login/components/AuthLayout.vue"
 import { useAdminStore } from "@/stores/admin"
 import FrontStageLayout from "@/views/frontstage/FrontStageLayout.vue"
@@ -104,7 +104,7 @@ const FrontRoutes = [
 
 // 创建路由实例
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [...BackRoutes, ...FrontRoutes],
 })
 
