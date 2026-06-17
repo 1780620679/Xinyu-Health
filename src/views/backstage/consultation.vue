@@ -72,7 +72,7 @@
 import { getConsultationDataAPI, getSessionMessagesAPI } from '@/apis/backend/consultation';
 import { onMounted, ref } from 'vue';
 import PageHead from './components/PageHead.vue';
-import { ConsultationDataParams, ConsultationDataResponse, Records, SessionMessagesResponse } from '@/types/backstage/consultation';
+import { ConsultationDataParams, ConsultationDataResponse, Records, SessionMessage } from '@/types/backstage/consultation';
 
 // 表格数据
 const tableData = ref<Records[]>([])
@@ -101,8 +101,8 @@ const handleSessionDetail = async (row: Records) => {
   sessionDetail.value = row
   showDetailDialog.value = true
   // 获取会话消息详情列表
-  const messages: SessionMessagesResponse = await getSessionMessagesAPI(row.id)
-  sessionDetail.value.messages = messages.messages || []
+  const messages: SessionMessage[] = await getSessionMessagesAPI(row.id)
+  sessionDetail.value.messages = messages || []
   loading.value = false
 }
 // 分页切换方法

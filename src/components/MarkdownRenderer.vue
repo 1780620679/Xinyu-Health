@@ -6,6 +6,8 @@
 
 <script setup>
 import { computed } from 'vue'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
 
 const props = defineProps({
   content: {
@@ -17,17 +19,24 @@ const props = defineProps({
     default: false
   }
 })
-
-// 简单的Markdown渲染器
+// 渲染Markdown内容
 const renderedContent = computed(() => {
   let html = props.content
 
   // 转义HTML标签（防止XSS）
   html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-  // 处理代码块（```）
+  // 处理代码块（```）→ 引入 highlight.js 实现语法高亮
   html = html.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
-    return `<pre class="code-block"><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`
+    const unescapedCode = code.trim()
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+    const language = lang && hljs.getLanguage(lang) ? lang : undefined
+    const highlighted = language
+      ? hljs.highlight(unescapedCode, { language }).value
+      : hljs.highlightAuto(unescapedCode).value
+    return `<pre class="code-block"><code class="hljs language-${lang || 'text'}">${highlighted}</code></pre>`
   })
 
   // 处理行内代码（`）
@@ -151,13 +160,10 @@ const renderedContent = computed(() => {
 }
 
 .markdown-content pre.code-block {
-  background: #1f2937;
-  color: #f9fafb;
   padding: 1em;
   border-radius: 0.5em;
   overflow-x: auto;
   margin: 1em 0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.85em;
   line-height: 1.4;
 }
@@ -165,7 +171,7 @@ const renderedContent = computed(() => {
 .markdown-content pre.code-block code {
   background: none;
   padding: 0;
-  color: inherit;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 .markdown-content a {
@@ -201,8 +207,3 @@ const renderedContent = computed(() => {
   color: #6b7280;
 }
 </style>
-
-
-
-
-
