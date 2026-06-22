@@ -27,7 +27,7 @@
     <el-pagination background :page-size="pagination.size" layout="prev, pager, next" :total="pagination.total"
       @change="handleCurrentChange" />
     <!-- 对话详情弹窗 -->
-    <el-dialog title="会话详情" v-model="showDetailDialog" width="70%" v-loading="loading">
+    <el-dialog title="会话详情" v-model="showDetailDialog" width="70%" v-loading="Dialogloading">
       <div class="session-detail">
         <div class="detail-header">
           <div class="detail-row">
@@ -47,7 +47,7 @@
           <div class="messages-header">
             <h4>消息详情</h4>
           </div>
-          <div class="messages-list" v-loading="loading">
+          <div class="messages-list" v-loading="Dialogloading">
             <div v-for="message in sessionDetail.messages" :key="message.id" class="message-item"
               :class="message.senderType === 1 ? 'user-message' : 'ai-message'">
               <div class="message-header">
@@ -84,10 +84,12 @@ const pagination = ref<ConsultationDataParams>({
 })
 // 获取咨询记录数据
 const handleSearch = async () => {
+  loading.value = true
   const res: ConsultationDataResponse = await getConsultationDataAPI(pagination.value)
   const { records, total } = res
   tableData.value = records
   pagination.value.total = total
+  loading.value = false
 }
 
 // 处理会话详情点击事件
@@ -95,15 +97,16 @@ const showDetailDialog = ref(false)
 const sessionDetail = ref<Records>({} as Records)
 // 加载状态
 const loading = ref(false)
+const Dialogloading = ref(false)
 
 const handleSessionDetail = async (row: Records) => {
-  loading.value = true
+  Dialogloading.value = true
   sessionDetail.value = row
   showDetailDialog.value = true
   // 获取会话消息详情列表
   const messages: SessionMessage[] = await getSessionMessagesAPI(row.id)
   sessionDetail.value.messages = messages || []
-  loading.value = false
+  Dialogloading.value = false
 }
 // 分页切换方法
 const handleCurrentChange = (page: number) => {
@@ -114,9 +117,7 @@ const handleCurrentChange = (page: number) => {
 
 
 onMounted(() => {
-  loading.value = true
   handleSearch()
-  loading.value = false
 })
 </script>
 <style scoped lang="scss">

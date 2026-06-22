@@ -3,7 +3,7 @@
     <PageHead title="情绪日志"></PageHead>
     <TableSearch :formItem="formItem" @search="handleSearch"></TableSearch>
     <!-- 表格 -->
-    <el-table :data="tableData" style="width: 100%;">
+    <el-table :data="tableData" style="width: 100%;" v-loading="loading">
       <el-table-column label="用户ID" width="80" prop="userId" fixed="left"></el-table-column>
       <el-table-column label="会话ID" width="80">
         <template #default="scope">
@@ -228,6 +228,9 @@ const pagination = reactive<EmotionalPageParams>({
 })
 // 表格数据
 const tableData = ref<EmotionalDiary[]>([])
+// 加载状态
+const loading = ref(false)
+
 
 
 // 分页切换方法
@@ -237,6 +240,7 @@ const handleCurrentChange = (page: number) => {
 }
 // 搜索方法(子传父回调来的数据)
 const handleSearch = async (formData: Record<string, any>) => {
+  loading.value = true
   // 合并分页配置和搜索表单数据
   const params = {
     ...pagination,
@@ -245,6 +249,7 @@ const handleSearch = async (formData: Record<string, any>) => {
   const { records, total } = await getEmotionalPageAPI(params)
   tableData.value = records
   pagination.total = total
+  loading.value = false
 }
 // 处理详情点击事件
 const showDetailDialog = ref(false)

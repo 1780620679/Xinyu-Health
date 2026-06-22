@@ -30,6 +30,11 @@
         </template>
       </el-dropdown>
     </div>
+
+    <!-- 用户中心弹窗 -->
+    <UserCenterDialog v-model="userCenterVisible" />
+    <!-- 设置弹窗 -->
+    <SettingDialog v-model="settingVisible" />
   </div>
 </template>
 <script setup>
@@ -38,6 +43,12 @@ import { useAdminStore } from "@/stores/admin"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { useRoute, useRouter } from "vue-router"
 import { ref, watch, onMounted } from "vue"
+import UserCenterDialog from "@/components/UserCenterDialog.vue"
+import SettingDialog from "@/components/SettingDialog.vue"
+
+// 弹窗显隐控制
+const userCenterVisible = ref(false)
+const settingVisible = ref(false)
 
 const route = useRoute()
 const router = useRouter()
@@ -77,20 +88,28 @@ const handleCollapse = () => {
   AdminStore.toggleCollapse()
 }
 
-// 处理退出登录
+// 处理下拉菜单命令
 const handleCommand = async (command) => {
-  if (command === "logout") {
-    ElMessageBox.confirm("确定退出登录吗？", "提示", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-      type: "warning",
-    }).then(async () => {
-      await LogoutAPI()
-      ElMessage.success("退出登录成功")
-      // 清除登录信息
-      AdminStore.clearUser()
-      router.push("/auth/login")
-    })
+  switch (command) {
+    case "user-center":
+      userCenterVisible.value = true
+      break
+    case "setting":
+      settingVisible.value = true
+      break
+    case "logout":
+      ElMessageBox.confirm("确定退出登录吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        await LogoutAPI()
+        ElMessage.success("退出登录成功")
+        // 清除登录信息
+        AdminStore.clearUser()
+        router.push("/auth/login")
+      })
+      break
   }
 }
 </script>
