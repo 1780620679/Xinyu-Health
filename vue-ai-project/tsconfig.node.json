@@ -1,0 +1,32 @@
+// 这是给 Vite 配置文件（vite.config.ts） 使用的 TypeScript 配置。
+
+// 为什么需要单独配置？
+
+// - 因为 vite.config.ts 是运行在 Node 环境中的
+// - Node 环境不需要 DOM 相关的类型
+// - 需要单独配置来告诉 TypeScript "这是在 Node 中运行的"
+
+{
+  "compilerOptions": {
+    // 组合模式，允许引用其他配置
+    "composite": true,
+    
+    // 跳过第三方库检查
+    "skipLibCheck": true,
+    
+    // Node 环境使用 ESNext 模块
+    "module": "ESNext",
+    
+    // 模块解析使用打包工具方式
+    "moduleResolution": "bundler",
+    
+    // 允许默认导入（import vue from 'vue'）
+    "allowSyntheticDefaultImports": true,
+    
+    // 严格模式
+    "strict": true
+  },
+  
+  // 只包含 vite.config.ts 文件
+  "include": ["vite.config.ts"]
+}

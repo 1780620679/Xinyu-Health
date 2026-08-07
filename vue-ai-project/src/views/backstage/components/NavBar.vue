@@ -1,0 +1,148 @@
+<template>
+  <div class="nav-bar">
+    <div class="flex-box">
+      <el-button @click="handleCollapse">
+        <el-icon>
+          <Expand />
+        </el-icon>
+      </el-button>
+      <p class="page-title">{{ route.meta.title }}</p>
+    </div>
+    <div class="flex-box">
+      <!-- 主题切换 -->
+      <el-switch v-model="isDark" @change="handleThemeChange" inline-prompt active-icon="Moon" inactive-icon="Sunny"
+        style="--el-switch-on-color: #2c3e50; --el-switch-off-color: #f5a623; margin-right: 20px;" />
+      <el-dropdown @command="handleCommand">
+        <div class="flex-box">
+          <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+            size="default"></el-avatar>
+          <p class="user-name">用户</p>
+          <el-icon>
+            <ArrowDown />
+          </el-icon>
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="user-center">用户中心</el-dropdown-item>
+            <el-dropdown-item command="setting">设置</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
+
+    <!-- 用户中心弹窗 -->
+    <UserCenterDialog v-model="userCenterVisible" />
+    <!-- 设置弹窗 -->
+    <SettingDialog v-model="settingVisible" />
+  </div>
+</template>
+<script setup>
+import { LogoutAPI } from "@/apis/admin"
+import { useAdminStore } from "@/stores/admin"
+import { ElMessage, ElMessageBox } from "element-plus"
+import { useRoute, useRouter } from "vue-router"
+import { ref, watch, onMounted } from "vue"
+import UserCenterDialog from "@/components/UserCenterDialog.vue"
+import SettingDialog from "@/components/SettingDialog.vue"
+
+// 弹窗显隐控制
+const userCenterVisible = ref(false)
+const settingVisible = ref(false)
+
+const route = useRoute()
+const router = useRouter()
+// 引入admin store中的isCollapse状态,控制是否折叠侧边栏
+const AdminStore = useAdminStore()
+
+// 同步暗黑模式状态
+const isDark = ref(AdminStore.isDark)
+// 监听 store 中的主题变化
+watch(() => AdminStore.isDark, (newVal) => {
+  isDark.value = newVal
+})
+
+// 处理主题切换
+const handleThemeChange = (value) => {
+  AdminStore.isDark = value
+  // 应用主题到 html 元素
+  if (value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
+
+onMounted(() => {
+  // 同步初始主题状态
+  isDark.value = AdminStore.isDark
+  // 应用初始主题
+  if (AdminStore.isDark) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+})
+
+const handleCollapse = () => {
+  AdminStore.toggleCollapse()
+}
+
+// 处理下拉菜单命令
+const handleCommand = async (command) => {
+  switch (command) {
+    case "user-center":
+      userCenterVisible.value = true
+      break
+    case "setting":
+      settingVisible.value = true
+      break
+    case "logout":
+      ElMessageBox.confirm("确定退出登录吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        await LogoutAPI()
+        ElMessage.success("退出登录成功")
+        // 清除登录信息
+        AdminStore.clearUser()
+        // 恢复默认主题
+        AdminStore.isDark = false
+        handleThemeChange(false)
+        router.push("/auth/login")
+      })
+      break
+  }
+}
+</script>
+<style lang="scss" scoped>
+.nav-bar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  border-bottom: 1px solid #e5e7eb;
+
+  .flex-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-title {
+    margin-left: 20px;
+    font-size: 26px;
+    font-weight: bold;
+    color: #1f2937;
+  }
+
+  .user-name {
+    margin: 0 5px;
+    font-weight: bold;
+  }
+}
+</style>

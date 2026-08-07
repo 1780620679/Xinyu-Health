@@ -1,0 +1,42 @@
+# 应用服务 WEB 访问端口
+server:
+  port: 1920
+
+# 数据库配置
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/mental_health_assistant?useSSL=false&serverTimezone=UTC
+    username: root
+    password: ${DB_PASSWORD}
+
+  ai:
+    openai:
+      chat:
+        options:
+          model: deepseek-v4-flash
+          tool-calling:
+            enabled: true
+        completions-path: /v1/chat/completions
+      api-key: ${DEEPSEEK_API_KEY}
+      base-url: https://api.deepseek.com
+
+# JWT配置
+jwt:
+  secret: ${JWT_SECRET}
+
+  expiration: 86400000  # 24小时（毫秒）
+  refresh-expiration: 604800000  # 7天（毫秒）
+  header: Authorization  # token头部名称
+  token-prefix: "Bearer "  # token前缀
+
+# 阿里云 OSS 配置
+aliyun:
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    bucket-name: zyh178
+    access-key-id: ${OSS_ACCESS_KEY_ID}
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
