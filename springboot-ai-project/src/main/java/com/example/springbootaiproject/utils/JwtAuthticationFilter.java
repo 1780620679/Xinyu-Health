@@ -70,7 +70,7 @@ public class JwtAuthticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authcation);
 
                     // 将token存储到请求属性中
-                    request.setAttribute("jwtToken", token);//到此才正式认证成功，后续的请求会根据此token进行权限校验
+                    request.setAttribute("jwtToken", token);//到此才正式认证成功，后续的请求会根据此token进行权限校验 （eg 获取当前用户/流式接口/知识分类/情绪日志等都会从request中获取这个定义的jwtToken）
                 } else {
                     clearSecurityContext();
                     ResponseUtil.writeError(response, ResultCode.TOKEN_ACCESS_FORBIDDEN);
@@ -82,7 +82,7 @@ public class JwtAuthticationFilter extends OncePerRequestFilter {
                 return;
             }
         }else {
-            // 清理上下文
+            // 清理上下文   Filter 层拿到的是原始的 HttpServletResponse 对象，可以直接往里面写数据，不需要像 Controller 那样通过返回值让 Spring 帮你序列化。 所以说，在 Filter 层可以手动设置响应状态码、响应头、响应体等。直接return终止后续处理。即可
             clearSecurityContext();
             ResponseUtil.writeError(response, ResultCode.ACCESS_UNAUTHORIZED);
             return;

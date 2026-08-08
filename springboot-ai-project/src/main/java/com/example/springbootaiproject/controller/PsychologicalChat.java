@@ -49,6 +49,13 @@ public class PsychologicalChat {
         StructOutPut.StreamChatSession session = psychologicalSupportService.startSession(userId, createDTO);
         return Result.ok(session);
     }
+    /**
+     * 流式返回聊天结果
+     * {
+     *   "sessionId": "session_123",
+     *   "userMessage": "我最近压力很大"
+     * }
+     */
 
     // 流式返回聊天结果 使用 Flux 实现
     //Flux<ServerSentEvent<String>>：这是 Spring WebFlux 的响应式类型。Flux 表示"0 到 N 个元素的异步流"，ServerSentEvent<String> 表示每个元素是一个 SSE 事件，数据体是 String。结合起来就是：这个方法会持续推送多条 SSE 事件给前端，比如 AI 逐字生成回复时，每个字/词作为一个事件推出去。

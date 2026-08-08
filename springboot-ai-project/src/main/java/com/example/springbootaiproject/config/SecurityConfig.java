@@ -34,7 +34,7 @@ public class SecurityConfig {
             "/files/**"
     };
 
-    //定义一个antPathMatcher对象，用于匹配路径
+    //定义一个antPathMatcher对象，用于匹配路由路径
     private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     //判断请求路径是否在公开路径列表中
@@ -65,7 +65,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // 将安全上下文保存到 request 属性中（而非 session），保证 SSE/流式接口的异步分派(async dispatch)阶段
+                // 将安全上下文（包含Authentication）保存到 request 属性中（而非 session），保证 SSE/流式接口的异步分派(async dispatch)阶段
                 // 仍能拿到 Authentication，避免流式结束时报 AuthorizationDeniedException: Access Denied
                 .securityContext(context -> context
                         .securityContextRepository(new RequestAttributeSecurityContextRepository())
@@ -77,7 +77,7 @@ public class SecurityConfig {
                         //其他请求都需要登录
                         .anyRequest().authenticated()
                 )
-                //添加JWT认证过滤器，用于在请求头中提取JWT并验证          addFilterBefore(A, B) 的意思是 "把 A 过滤器排在 B 过滤器前面执行"。这样每个请求进来，先经过 JwtAuthticationFilter 验证 token，验证通过后才到 Spring Security 的默认认证过滤器。
+                //添加JWT认证过滤器，用于在请求头中提取JWT并验证   addFilterBefore(A, B) 的意思是 "把 A 过滤器排在 B 过滤器前面执行"。这样每个请求进来，先经过 JwtAuthticationFilter 验证 token，验证通过后才到 Spring Security 的默认认证过滤器。
                 .addFilterBefore(jwtAuthticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

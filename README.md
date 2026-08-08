@@ -79,7 +79,14 @@ npm install    # 或 pnpm install
 npm run dev    # 或 pnpm dev
 ```
 
-启动后，浏览器访问前端开发地址（默认 `http://localhost:5173`）即可。
+首次启动时，在 Windows PowerShell 中执行 `Copy-Item .env.example .env` 创建本地配置。如果本地已经存在 `.env`，请保留原文件，只需确认包含以下配置：
+
+```dotenv
+DEV_PORT=5173
+API_PROXY_TARGET=http://localhost:1920
+```
+
+启动后，浏览器访问前端开发地址（默认 `http://localhost:5173`）即可。开发环境中的 `/api` 请求会由 Vite 转发至 `http://localhost:1920`。
 
 ## 主要功能
 

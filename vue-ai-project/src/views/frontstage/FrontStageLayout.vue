@@ -14,6 +14,7 @@
             :class="{ 'active-nav': $route.path === '/emotion-diary' }">心情日志</router-link>
           <router-link to="/knowledge" class="nav-item"
             :class="{ 'active-nav': $route.path === '/knowledge' || $route.path.startsWith('/knowledge/article/') }">知识库</router-link>
+            
           <div class="nav-divider"></div>
           <el-switch v-model="isDark" @change="handleThemeChange" inline-prompt active-icon="Moon"
             inactive-icon="Sunny" />
