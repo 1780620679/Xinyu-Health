@@ -203,8 +203,7 @@ import { onMounted, ref, onUnmounted } from 'vue';
 import { deleteSessionAPI, getSessionDetailAPI, getSessionListAPI, getSessionEmotionAPI, startSessionAPI, } from '@/apis/frontend/consultation'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
-import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { useAdminStore } from '@/stores/admin';
+import { useChatStream } from '@/composables/useChatStream';
 import * as echarts from 'echarts';
 import type { SessionMessage, SessionInfo, SessionEmotionResponse, StartSessionParams } from '@/types/frontstage/consultation';
 
@@ -218,8 +217,8 @@ const userUrl = new URL('@/assets/images/users.png', import.meta.url).href
 const messages = ref<SessionMessage[]>([])
 // 用户输入的消息
 const userMessage = ref<string>('')
-// 是否助手正在回复(用于禁用输入框)
-const isAiTyping = ref<boolean>(false)
+// AI 流式连接由 composable 统一管理，页面只消费连接状态和回调结果
+const { isStreaming: isAiTyping, startStream, stopStream } = useChatStream()
 
 // 情绪趋势图表
 const chartRef = ref<HTMLElement | null>(null)
@@ -448,6 +447,8 @@ const formatUserMessage = (message: string): string => {
 const currentSession = ref<Session | null>(null)
 //创建临时会话消息(只是在先创建一个临时会话对象，不调用后端接口创建会话)
 const createNewConversation = (): void => {
+  // 切换到新会话时终止旧连接，避免旧回复污染新页面
+  stopStream()
   //创建一个新的会话对象
   const newSession: Session = {
     sessionId: `temp_${Date.now()}`,//会话ID
@@ -512,19 +513,19 @@ const startNewSession = async (usermessage: string): Promise<void> => {
   }
   //调用后端接口创建会话
   const res = await startSessionAPI(params)
-  // console.log(res);
+  
   //把后端返回的数据转为前端会话的格式
   const sessionData: Session = {
     sessionId: res.sessionId,//会话ID
     status: res.status,//会话状态
-    sessionTitle: params.sessionTitle || '新会话',//会话标题
+    sessionTitle: params.sessionTitle || '新会话',
   }
   //如果是临时会话，更新数据
   if (currentSession.value && currentSession.value.status === 'TEMP') {
     //更新为正式会话
     Object.assign(currentSession.value, sessionData)
   } else {
-    //否则即，创建一个新的会话
+    //否则即，历史会话，直接赋值可以确保获取到最新的会话数据
     currentSession.value = sessionData
   }
   //创建会话后，刷新会话历史列表
@@ -549,8 +550,6 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
     ElMessage.error('正在回复中，请稍后再发送')
     return
   }
-  //设置正在回复中
-  isAiTyping.value = true
   //创建一个ai默认消息,也作为占位符，等ai回复完成后，再替换为实际的回复内容
   const aiMessage: SessionMessage = {
     id: `ai_${Date.now()}_${Math.random().toString(36).substring(2)}`,//定义一个唯一的id
@@ -559,95 +558,28 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
     content: '',//消息内容
     createdAt: new Date().toISOString(),//创建时间
   }
-  //将ai回复消息添加到消息列表中（用户消息+ai默认消息）
-  messages.value.push(aiMessage)
-  //调用流式接口
-  const ctrl = new AbortController()//js里自带的专门用于终止fetch请求的控制器
-  fetchEventSource('/api/psychological-chat/stream', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Token': useAdminStore().token,
-      'Accept': 'text/event-stream',
+  //开启流式对话，监听后端返回的消息
+  const started = startStream({
+    sessionId,
+    userMessage,
+    // 处理流式数据。追加到aiMessage.content中
+    onChunk(content) {
+      aiMessage.content += content
     },
-    body: JSON.stringify({
-      sessionId,
-      userMessage,
-    }),
-    //添加取消信号
-    signal: ctrl.signal,
-    //监听连接成功事件，判断类型是不是想要的流式类型
-    //@ts-ignore
-    onopen: (res: any) => {
-      if (res.headers.get('Content-Type') !== 'text/event-stream') {
-        ElMessage.error('连接失败，返回的不是流式数据类型')
-      }
+    onDone() {
+      getEmotionAnalysis(sessionId)
     },
-    //正常返回的消息就会触发onmessage事件
-    // 多次触发 onmessage 回调（每次返回一小段 AI 回复）
-    // ↓
-    // ├─ 收到普通消息 → 解析 payload → 追加到 aiMessage.content
-    // └─ 收到 'done' 事件 → 设置 isAiTyping = false
-    //                       → ctrl.abort() 断开连接
-    //                       → 调用情绪分析
-    //                       → return 退出回调 /                            
-    onmessage: (event: any) => {
-      //获取返回的消息
-      const raw = event.data.trim()
-      if (!raw) return
-      //当前的对象
-      const eventName = event.event
-      //当前会话的AI消息，就是messages数组的最后一个元素
-      const aiMessage = messages.value[messages.value.length - 1]
-
-      if (eventName === 'done') {
-        //ai回复完成
-        isAiTyping.value = false
-        ctrl.abort()    //ctrl.abort() 不阻断当前函数执行，它只是通知底层 fetch 请求"可以停了"，当前回调该跑完的代码照跑。所以顺序是：
-                        // ctrl.abort()     → 发信号：连接可以断了
-                        // getEmotionAnalysis() → 正常执行 ✅
-                        // return           → 退出回调
-        //获取情绪分析结果
-        // console.log('ai 在 onmessage 事件中');
-        if (currentSession.value) {
-          getEmotionAnalysis(currentSession.value.sessionId)
-        }
-        return
-      }
-      //将返回的消息解析为json格式
-      const payload = JSON.parse(raw)
-      //判断是否成功
-      const ok = String(payload.code) === '200'
-      if (ok && payload.data && payload.data.content) {
-        aiMessage.content += payload.data.content
-      } else if (!ok) {
-        handleError(payload.message || 'ai回复失败')
-      }
+    onError(error) {
+      aiMessage.content = 'AI 回复失败，请稍后再重试'
+      aiMessage.isError = true
+      ElMessage.error(error.message)
     },
-    //监听错误事件
-    onerror: (error: any) => {
-      handleError(error || 'ai回复失败')
-    },
-    //监听关闭事件 onclose 在 ctrl.abort() 手动断开时其实不会触发。它只在服务器主动关闭或网络异常断连时才走。
-    onclose: () => { 
-      //ai回复完成，开始情绪分析结果
-      if (currentSession.value) {
-        getEmotionAnalysis(currentSession.value.sessionId)
-      }
-      console.log('ai 在 onclose 事件中');
-    },
-
   })
-}
-//错误处理
-const handleError = (error: string | Error): void => {
-  //当前会话的AI消息
-  const aiMessage = messages.value[messages.value.length - 1]
-  if (aiMessage) {
-    aiMessage.content = 'ai回复失败，请稍后再重试'
+
+  if (started) {
+    //将AI占位消息添加到列表，后续收到的片段会持续更新同一个对象
+    messages.value.push(aiMessage)
   }
-  isAiTyping.value = false
-  ElMessage.error(error instanceof Error ? error.message : error)
 }
 
 onMounted(() => {
@@ -660,6 +592,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // 离开页面时终止仍在进行的 SSE 请求，避免内存和网络资源泄漏
+  stopStream()
   // 销毁图表实例
   if (chart) {
     chart.dispose()
@@ -1312,7 +1246,7 @@ onUnmounted(() => {
 ## 流式对话的核心流程
 1. 创建一个临时的AI消息占位符（content为空）
 2. 添加到消息列表显示
-3. 调用流式API fetchEventSource
+3. 调用 useChatStream，由 composable 通过 fetchEventSource 连接流式 API
 4. 后端每返回一段数据，就追加到 aiMessage.content
 5. 当收到 done 事件时，表示AI回复完成
 ## 为什么要用 Object.assign
