@@ -130,7 +130,7 @@
         </el-button>
       </div>
       <!-- 聊天内容区域 -->
-      <div class="chat-messages">
+      <div ref="chatMessagesRef" class="chat-messages" @scroll.passive="handleChatScroll">
         <!-- 默认欢迎用语 -->
         <div class="message-item ai-message" v-if="messages.length === 0">
           <div class="message-avatar">
@@ -157,7 +157,8 @@
             <div class="message-bubble">
               <!-- 1为用户消息 2为AI助手消息 -->
               <!-- ai正在思考 。。。 -->
-              <div v-if="msg.senderType === 2 && isAiTyping && !msg.content" class="typing-indicator">
+              <div v-if="msg.senderType === 2 && isAiTyping && msg.id === activeAiMessage?.id && !msg.content"
+                class="typing-indicator">
                 <div class="typing-dot" v-for="dot in 3" :key="dot"></div>
               </div>
               <!-- ai错误提示 可能ai出bug了-->
@@ -169,9 +170,10 @@
                 :is-ai-message="true" />
               <!-- 用户的消息 -->
               <p v-else-if="msg.content" v-html="formatUserMessage(msg.content)"></p>
+              <div v-if="msg.isStopped" class="stopped-message">已停止生成</div>
             </div>
             <div class="message-time">
-              {{ msg.senderType === 2 && isAiTyping ? '正在回复中...' : msg.createdAt }}
+              {{ msg.senderType === 2 && isAiTyping && msg.id === activeAiMessage?.id ? '正在回复中...' : msg.createdAt }}
             </div>
           </div>
         </div>
@@ -188,7 +190,13 @@
           </div>
         </div>
         <!-- 右侧发送按钮 -->
-        <el-button :disabled="!userMessage.trim() || userMessage.length > 500" class="send-btn" type="primary"
+        <el-button v-if="isAiTyping" class="send-btn stop-btn" type="danger" title="停止生成"
+          @click="handleStopGenerating">
+          <el-icon>
+            <VideoPause />
+          </el-icon>
+        </el-button>
+        <el-button v-else :disabled="!userMessage.trim() || userMessage.length > 500" class="send-btn" type="primary"
           @click="sendMessage">
           <el-icon>
             <Promotion />
@@ -199,7 +207,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted, reactive, nextTick } from 'vue';
 import { deleteSessionAPI, getSessionDetailAPI, getSessionListAPI, getSessionEmotionAPI, startSessionAPI, } from '@/apis/frontend/consultation'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
@@ -219,6 +227,64 @@ const messages = ref<SessionMessage[]>([])
 const userMessage = ref<string>('')
 // AI 流式连接由 composable 统一管理，页面只消费连接状态和回调结果
 const { isStreaming: isAiTyping, startStream, stopStream } = useChatStream()
+// 当前正在接收流式内容的 AI 消息
+const activeAiMessage = ref<SessionMessage | null>(null)
+
+// 消息列表滚动控制
+const chatMessagesRef = ref<HTMLElement | null>(null)
+const shouldAutoScroll = ref(true)
+let scrollFrameId: number | null = null
+
+const handleChatScroll = (): void => {
+  const container = chatMessagesRef.value
+  if (!container) return
+  const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+// scrollTop：当前已经向下滚动了多少距离。
+// scrollHeight：消息列表全部内容的总高度。
+// clientHeight：当前肉眼能看到的区域高度。
+// distanceToBottom：距离底部的距离。
+// 当距离底部小于80px时，自动滚动到底部 大于80px时，说明用户在往上滑动，不自动滚动到底部
+  shouldAutoScroll.value = distanceToBottom < 80
+}
+//当用户在上面滑动时，shouldAutoScroll为false，然后此时发送消息，调用scrollToBottom(true)强制滚动到底部
+const scrollToBottom = async (force = false): Promise<void> => {
+  if (force) shouldAutoScroll.value = true
+  if (!force && !shouldAutoScroll.value) return //用户在往上滑动，不自动滚动到底部
+
+  // 等待 Vue 把新消息渲染到 DOM 后再读取最新的 scrollHeight
+
+  // 因为当执行messages.value.push(userMessage)
+  // 之后，Vue 不一定立刻修改真实 DOM。
+  // 大致过程是：
+  // 修改 messages 数组
+  // → Vue 发现数据发生变化
+  // → Vue 把更新任务放入队列
+  // → 当前 JavaScript 执行结束
+  // → Vue 更新真实 DOM
+  // 如果我们刚刚 push 完消息，就马上获取：
+  // container.scrollHeight
+  // 这时新消息可能还没有渲染出来，获得的还是旧高度。
+  await nextTick()
+  if (scrollFrameId !== null) return
+//window.requestAnimationFrame 是一个异步函数，用于在浏览器重绘前执行指定的回调函数
+  // 使用它来进行记录一个scrollFrameId，不然每次ai输出一个字符，滚动条就会大量一点点滚动，影响性能
+  // 如果每一个片段都立刻滚动，可能短时间调用几十次，造成：
+  // 页面频繁重新计算布局；
+  // 滚动卡顿；
+  // 性能浪费。
+  // requestAnimationFrame 可以理解成：
+  // 等浏览器准备绘制下一帧画面时，再执行滚动。
+// 一般屏幕一秒刷新大约 60 次，因此每帧约 16.7 毫秒。
+  scrollFrameId = window.requestAnimationFrame(() => {
+    scrollFrameId = null
+    const container = chatMessagesRef.value
+    if (!container) return
+    container.scrollTo({
+      top: container.scrollHeight,  // top 表示滚动到哪个纵向位置。
+      behavior: force ? 'smooth' : 'auto',//behavior 控制滚动方式：smooth平滑滚动 auto自动滚动 force判断用户发送消息：使用平滑滚动。AI 持续输出：立即跟随。
+    })
+  })
+}
 
 // 情绪趋势图表
 const chartRef = ref<HTMLElement | null>(null)
@@ -226,6 +292,8 @@ let chart: echarts.ECharts | null = null
 
 // 情绪历史数据类型
 interface EmotionHistoryItem {
+  sessionId: string;
+  sessionTitle: string;
   time: string;
   score: number;
   emotion: string;
@@ -270,30 +338,41 @@ const getRiskLevel = (level: number): string => {
 }
 //获取情绪分析结果
 const getEmotionAnalysis = async (sessionId: string | number): Promise<void> => {
-  //确保sessionId格式正确 sessionId_123
-  const id = sessionId.toString().startsWith('session_') ? sessionId : 'session_' + sessionId
+  //确保sessionId格式正确 session_123
+  const id = sessionId.toString().startsWith('session_') ? sessionId.toString() : 'session_' + sessionId
   //获取情绪分析结果
-  const res = await getSessionEmotionAPI(id as string)
-  // console.log(res, '情绪分析结果');
-  //更新情绪花园数据
-  currentEmotion.value = res
+  const res = await getSessionEmotionAPI(id)
 
-  // 将情绪数据添加到历史记录
-  const now = new Date()
-  const emotionData: EmotionHistoryItem = {
-    time: `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`,
-    score: res.emotionScore,
-    emotion: res.primaryEmotion
+  // 请求返回前用户可能已经切换会话，旧结果不能覆盖当前情绪花园
+  if (currentSession.value?.sessionId === id) {
+    currentEmotion.value = res
   }
+}
 
-  // 添加到历史记录
-  emotionHistory.value.push(emotionData)
+const formatEmotionTime = (value?: string): string => {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  const month = (date.getMonth() + 1).toString().padStart(2, '0')
+  const day = date.getDate().toString().padStart(2, '0')
+  const hour = date.getHours().toString().padStart(2, '0')
+  const minute = date.getMinutes().toString().padStart(2, '0')
+  return `${month}-${day} ${hour}:${minute}`
+}
 
-  // 限制历史记录数量，只保留最近10条
-  if (emotionHistory.value.length > 10) {
-    emotionHistory.value = emotionHistory.value.slice(-10)
-  }
-  // 更新图表
+// 会话列表是唯一数据源：每条会话最多生成一个趋势点
+const rebuildEmotionHistory = (): void => {
+  emotionHistory.value = sessionList.value
+    .filter(session => session.emotionScore !== undefined && session.primaryEmotion)
+    .slice()
+    .reverse()
+    .map(session => ({
+      sessionId: String(session.id),
+      sessionTitle: session.sessionTitle,
+      time: formatEmotionTime(session.emotionUpdatedAt || session.startedAt),
+      score: session.emotionScore as number,
+      emotion: session.primaryEmotion as string,
+    }))
   updateChart()
 }
 
@@ -329,8 +408,8 @@ const updateChart = (): void => {
       formatter: function (params: any) {
         const data = params[0]
         const index = data.dataIndex
-        const emotion = emotionHistory.value[index].emotion
-        return `${data.name}<br/>情绪: ${emotion}<br/>指数: ${data.value}`
+        const item = emotionHistory.value[index]
+        return `${item.sessionTitle}<br/>${data.name}<br/>情绪: ${item.emotion}<br/>指数: ${data.value}`
       }
     },
     xAxis: {
@@ -377,7 +456,8 @@ const updateChart = (): void => {
   }
 
   // 应用配置
-  chart.setOption(option)
+  // 每次都按会话列表完整重建，避免 ECharts 合并旧数据造成残留点
+  chart.setOption(option, { notMerge: true })
 }
 
 // 会话历史列表
@@ -398,6 +478,7 @@ const getSessionList = async (): Promise<void> => {
   })
   // console.log(res, '会话历史列表');
   sessionList.value = res.records
+  rebuildEmotionHistory()
 }
 
 // 点击会话历史项 ,切换到该会话
@@ -406,6 +487,7 @@ const handleSessionClick = async (session: SessionInfo): Promise<void> => {
   const res = await getSessionDetailAPI(session.id)
   // console.log(res, '会话记录详情');
   messages.value = res
+  void scrollToBottom(true)
 
 
   //获取情绪分析结果
@@ -449,6 +531,7 @@ const currentSession = ref<Session | null>(null)
 const createNewConversation = (): void => {
   // 切换到新会话时终止旧连接，避免旧回复污染新页面
   stopStream()
+  activeAiMessage.value = null
   //创建一个新的会话对象
   const newSession: Session = {
     sessionId: `temp_${Date.now()}`,//会话ID
@@ -494,6 +577,7 @@ const sendMessage = (): void => {
       senderType: 1,
       createdAt: new Date().toISOString(),//创建时间
     })
+    void scrollToBottom(true)
     startAIResponse(currentSession.value.sessionId, usermessage)
   }
 
@@ -538,6 +622,7 @@ const startNewSession = async (usermessage: string): Promise<void> => {
     senderType: 1,
     createdAt: new Date().toISOString(),//创建时间
   })
+  void scrollToBottom(true)
   //开启流式对话，监听后端返回的消息
   if (currentSession.value) {
     startAIResponse(currentSession.value.sessionId, usermessage)
@@ -551,13 +636,14 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
     return
   }
   //创建一个ai默认消息,也作为占位符，等ai回复完成后，再替换为实际的回复内容
-  const aiMessage: SessionMessage = {
+  // 必须使用 reactive：SSE 回调持有并逐片修改这个对象，普通对象不会触发 Vue 增量渲染
+  const aiMessage = reactive<SessionMessage>({
     id: `ai_${Date.now()}_${Math.random().toString(36).substring(2)}`,//定义一个唯一的id
     senderType: 2,//AI助手消息
     sessionId: currentSession.value!.sessionId,//会话ID
     content: '',//消息内容
     createdAt: new Date().toISOString(),//创建时间
-  }
+  })
   //开启流式对话，监听后端返回的消息
   const started = startStream({
     sessionId,
@@ -565,21 +651,41 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
     // 处理流式数据。追加到aiMessage.content中
     onChunk(content) {
       aiMessage.content += content
+      void scrollToBottom()  //注意这里没传值 ，由force判断，保证用户发送消息：使用平滑滚动。AI 持续输出：立即跟随。 force为true时，滚动到最底部 但是用户在ai输出时向上划，就不打扰
     },
     onDone() {
-      getEmotionAnalysis(sessionId)
+      activeAiMessage.value = null
+      // 后端在 SSE 完成前已更新本会话情绪；刷新当前卡片和趋势列表
+      void Promise.all([
+        getEmotionAnalysis(sessionId),
+        getSessionList(),
+      ])
     },
     onError(error) {
       aiMessage.content = 'AI 回复失败，请稍后再重试'
       aiMessage.isError = true
+      activeAiMessage.value = null
       ElMessage.error(error.message)
     },
   })
 
   if (started) {
+    activeAiMessage.value = aiMessage
     //将AI占位消息添加到列表，后续收到的片段会持续更新同一个对象
     messages.value.push(aiMessage)
+    void scrollToBottom(true)
   }
+}
+
+const handleStopGenerating = (): void => {
+  if (!isAiTyping.value) return
+
+  stopStream()
+  if (activeAiMessage.value) {
+    activeAiMessage.value.isStopped = true
+  }
+  activeAiMessage.value = null
+  void scrollToBottom(true)
 }
 
 onMounted(() => {
@@ -594,6 +700,11 @@ onMounted(() => {
 onUnmounted(() => {
   // 离开页面时终止仍在进行的 SSE 请求，避免内存和网络资源泄漏
   stopStream()
+  activeAiMessage.value = null
+  if (scrollFrameId !== null) {
+    window.cancelAnimationFrame(scrollFrameId)
+    scrollFrameId = null
+  }
   // 销毁图表实例
   if (chart) {
     chart.dispose()
@@ -1133,6 +1244,14 @@ onUnmounted(() => {
               align-items: center;
               gap: 8px;
             }
+
+            .stopped-message {
+              margin-top: 8px;
+              padding-top: 8px;
+              border-top: 1px dashed rgba(120, 113, 108, 0.3);
+              color: #78716c;
+              font-size: 12px;
+            }
           }
 
           .message-time {
@@ -1175,6 +1294,11 @@ onUnmounted(() => {
         border: none !important;
         box-shadow: 0 6px 20px rgba(255, 154, 86, 0.25);
         transition: all 0.3s ease;
+
+        &.stop-btn {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+          box-shadow: 0 6px 20px rgba(220, 38, 38, 0.25);
+        }
       }
 
     }

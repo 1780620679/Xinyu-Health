@@ -31,4 +31,11 @@ public class ConsultationSessionVO {
 
     /** 前台：持续分钟数 */
     private Long durationMinutes;
+
+    /** 该会话最后一次情绪分析摘要，用于绘制会话情绪趋势 */
+    private String primaryEmotion;
+
+    private Integer emotionScore;
+
+    private LocalDateTime emotionUpdatedAt;
 }

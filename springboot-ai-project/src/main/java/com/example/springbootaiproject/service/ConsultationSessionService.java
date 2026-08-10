@@ -2,6 +2,8 @@ package com.example.springbootaiproject.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.springbootaiproject.DTO.command.ConsultationSessionCreateDTO;
@@ -120,6 +122,18 @@ public class ConsultationSessionService {
             vo.setSessionTitle(session.getSessionTitle());
             vo.setStartedAt(session.getStartedAt());
             vo.setStatus("ACTIVE");
+
+            // 一条会话只保存最后一次情绪分析，列表仅返回绘图需要的摘要字段
+            if (StrUtil.isNotBlank(session.getLastEmotionAnalysis())) {
+                try {
+                    JSONObject emotion = JSONUtil.parseObj(session.getLastEmotionAnalysis());
+                    vo.setPrimaryEmotion(emotion.getStr("primaryEmotion"));
+                    vo.setEmotionScore(emotion.getInt("emotionScore"));
+                    vo.setEmotionUpdatedAt(session.getLastEmotionUpdatedAt());
+                } catch (RuntimeException ignored) {
+                    // 历史脏数据不应导致整个会话列表查询失败
+                }
+            }
 
             // 消息数
             Long count = messageCountMap.get(session.getId());

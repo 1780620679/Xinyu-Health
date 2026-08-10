@@ -28,6 +28,9 @@ export interface SessionInfo {
   durationMinutes: number;
   lastMessageContent: string;
   status: string;
+  primaryEmotion?: string;
+  emotionScore?: number;
+  emotionUpdatedAt?: string;
 }
 
 // 会话列表响应
@@ -47,6 +50,7 @@ export interface SessionMessage {
   senderType: number; // 1: 用户, 2: AI助手
   createdAt: string;
   isError?: boolean;
+  isStopped?: boolean;
 }
 
 // 会话详情响应

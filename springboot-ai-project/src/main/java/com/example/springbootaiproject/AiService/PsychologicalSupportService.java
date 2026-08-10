@@ -19,6 +19,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
@@ -127,7 +128,7 @@ public class PsychologicalSupportService {
             StringBuilder fullResponse = new StringBuilder();
 
             // 使用chatClient发送消息到Open AI
-            chatClient.prompt(prompt)
+            Disposable aiSubscription = chatClient.prompt(prompt)
                     .user(userMessage)// 加入用户提示词
                     .advisors(advisorSpec -> advisorSpec.param(ChatMemory.CONVERSATION_ID, conversationId))// 加入会话记忆体ID
                     .stream()               // 设置流式响应
@@ -154,6 +155,9 @@ public class PsychologicalSupportService {
                         sink.error(error);// 发布错误
                     })
                     .subscribe(); // 订阅并启动流
+
+            // 浏览器通过 AbortController 断开 SSE 时，同时取消底层 AI 流，避免后端继续生成
+            sink.onCancel(aiSubscription);
         });
     }
 
