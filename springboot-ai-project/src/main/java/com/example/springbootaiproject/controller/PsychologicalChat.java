@@ -76,13 +76,23 @@ public class PsychologicalChat {
         }
 
         // 开始流式对话
-        return psychologicalSupportService.streamPsychologicalChat(streamDTO.getSessionId(), streamDTO.getUserMessage())//此时返回的是一个字符串流
+        return psychologicalSupportService.streamPsychologicalChat(
+                        streamDTO.getSessionId(),
+                        streamDTO.getUserMessage(),
+                        Boolean.TRUE.equals(streamDTO.getRetry()))//此时返回的是一个字符串流
                 .map(fragment -> {
                     return ServerSentEvent.<String>builder()
                         .event("message")
                         .data(JSONUtil.toJsonStr(Result.ok(Map.of("content", fragment,"type","normal"))))
                         .build();
                 })
+                .onErrorResume(error -> Flux.just(ServerSentEvent.<String>builder()
+                        .event("error")
+                        .data(JSONUtil.toJsonStr(Result.error(
+                                ResultCode.ERROR.getCode(),
+                                "AI 服务处理失败，请稍后重试",
+                                null)))
+                        .build()))
                 .concatWith(Flux.just(ServerSentEvent.<String>builder() // 对话结束事件
                         .event("done")
                         .data(JSONUtil.toJsonStr(Result.ok(Map.of("content", "对话结束","type","end"))))

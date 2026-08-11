@@ -13,6 +13,7 @@ interface StreamPayload {
 interface StartChatStreamOptions {
   sessionId: string
   userMessage: string
+  isRetry?: boolean
   onChunk: (content: string) => void //这三个方法是我们定义的，方便组件调用 是一个回调钩子,让外部组件可以自定义"AI 回复/过程中/完成后/失败后要做什么"
   onDone: () => void                    //都是外部调用 startStream 时必须传入的参数。
   onError: (error: Error) => void
@@ -65,7 +66,9 @@ export const useChatStream = () => {
         activeController = null
       }
       controller.abort()
-      const error = reason instanceof Error ? reason : new Error(String(reason || 'AI 回复失败'))
+      const error = reason instanceof Error
+        ? reason
+        : new Error('AI 回复失败，请稍后重试')
       options.onError(error)
     }
 
@@ -79,13 +82,24 @@ export const useChatStream = () => {
       body: JSON.stringify({
         sessionId: options.sessionId,
         userMessage: options.userMessage,
+        retry: options.isRetry ?? false,
       }),
       signal: controller.signal,//添加取消信号
       async onopen(response) {
         // 监听连接成功事件，判断类型是不是想要的流式类型
         const contentType = response.headers.get('content-type') || ''
-        if (!response.ok || !contentType.includes('text/event-stream')) {
-          const error = new Error(`流式连接失败（HTTP ${response.status}）`)
+        if (!response.ok) {
+          const message = response.status === 401 || response.status === 403
+            ? '登录状态已失效，请重新登录后再试'
+            : response.status >= 500
+              ? 'AI 服务暂时不可用，请稍后重试'
+              : `AI 请求失败（HTTP ${response.status}）`
+          const error = new Error(message)
+          fail(error)
+          throw error
+        }
+        if (!contentType.includes('text/event-stream')) {
+          const error = new Error('AI 服务返回了异常的数据格式，请稍后重试')
           fail(error)
           throw error
         }
@@ -106,13 +120,16 @@ export const useChatStream = () => {
             options.onChunk(payload.data.content)// ← 触发外部传入的分块回调 用于处理流式数据
             return
           }
-          fail(payload.message || 'AI 回复失败')
+          fail(new Error(payload.message || 'AI 服务处理失败，请稍后重试'))
         } catch (error) {
-          fail(error)
+          fail(error instanceof Error
+            ? error
+            : new Error('AI 返回的数据解析失败，请稍后重试'))
         }
       },
       onclose() {
-        finish()
+        // 正常结束一定会先收到 done；未收到 done 就断开，属于可重试的异常中断
+        fail(new Error('连接意外中断，请重新生成'))
       },
       onerror(error) {
         fail(error)

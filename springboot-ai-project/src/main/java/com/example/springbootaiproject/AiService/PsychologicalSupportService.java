@@ -80,7 +80,7 @@ public class PsychologicalSupportService {
      * @param userMessage 用户消息
      * @return 流式响应
      */
-    public Flux<String> streamPsychologicalChat(String sessionId, String userMessage) {
+    public Flux<String> streamPsychologicalChat(String sessionId, String userMessage, boolean retry) {
         // 创建响应流
         return Flux.create(sink -> {
             // sink.next("数据1") // 发布数据
@@ -99,16 +99,31 @@ public class PsychologicalSupportService {
             //、表里仅有初始消息的这个时间窗口内，做一次去重比对。如果前端把初始消息又发了一遍，就跳过入库；一旦过了这个窗口（AI 回复入库后 messageCount > 1），就不再检查，后续消息直接正常保存。
             //当 messageCount > 1 时，说明已经有多轮对话了，此时传来的消息一定是新的，没必要再比对。
             //  messageCount == 0	异常情况，理论上不会发生	跳过检查，直接保存
+
+            //主要功能是智能判断用户消息是否需要保存到数据库，避免重复保存。
             Integer messageCount = consultationMessageService.getMessageCountBySessionId(dbSessionId);
-            if (messageCount == 1) {
-                ConsultationMessageResponseDTO lastMessage = consultationMessageService.getLastMessageBySessionId(dbSessionId);
-                if (lastMessage != null && lastMessage.getSenderType() == 1 && userMessage.equals(lastMessage.getContent())) {
-                    isInitialMessage = true;
-                }
+            ConsultationMessageResponseDTO lastMessage = consultationMessageService.getLastMessageBySessionId(dbSessionId);
+            boolean matchesLastUserMessage = lastMessage != null //最后一条消息存在
+                    && lastMessage.getSenderType() == 1          //最后一条消息是用户发送的（senderType == 1）
+                    && userMessage.equals(lastMessage.getContent()); //最后一条消息的内容与当前用户消息完全相同
+            if (messageCount == 1 && matchesLastUserMessage) {
+                isInitialMessage = true;
             }
-            if (!isInitialMessage) {
+            // 不能只相信前端的 retry 标记，还要验证最后一条数据库消息确实是同一个问题
+            boolean isValidRetry = retry && matchesLastUserMessage;
+            if (!isInitialMessage && !isValidRetry) {
                 // 可能用户只是在session表里插入了一条记录，但是由于一些bug导致message表里还没有初始消息
                 // 保存用户消息到数据库
+                // 不是初始消息（不是重复的初始消息）
+                //✅ 不是合法的重试（不是重试同一个问题）
+                //只有同时满足这两个条件，才会将用户消息保存到数据库。
+//                这段代码的核心目的是防止消息重复保存，处理了三种情况：
+//
+//                场景	           messageCount	matchesLastUserMessage	retry	         是否保存
+//                首次发送初始消息	      0	                 false	         false	          ✅ 保存
+//                前端重复发送初始消息	 1	                 true           false               ❌ 不保存
+//                合法重试（相同问题）	 >1	                true  	       true	                ❌ 不保存
+//                正常新消息	        >1	                false          	false	            ✅ 保存
                 consultationMessageService.saveUserMessage(dbSessionId, userMessage, null);
             }
             //-----------------------------------------------------核心逻辑----------------------------------------------------------------------------//
@@ -118,7 +133,9 @@ public class PsychologicalSupportService {
             // 构建系统提示词
             List<Message> userMessages = new ArrayList<>();// 初始化用户消息列表泛型<Message>为springai的Message类
             userMessages.add(new UserMessage(userMessage));//加入用户提示词
-            chatMemory.add(conversationId, userMessages);// 加入用户消息到会话记忆体
+            if (!isValidRetry) {
+                chatMemory.add(conversationId, userMessages);// 加入用户消息到会话记忆体
+            }
             // 构建系统提示词
             Prompt prompt = new Prompt(List.of(
                     new SystemMessage(PromptManage.PSYCHOLOGICAL_SUPPORT_SYSTEM_PROMPT)//加入系统提示词

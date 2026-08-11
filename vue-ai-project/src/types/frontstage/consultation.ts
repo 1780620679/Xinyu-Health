@@ -51,6 +51,7 @@ export interface SessionMessage {
   createdAt: string;
   isError?: boolean;
   isStopped?: boolean;
+  errorMessage?: string;
 }
 
 // 会话详情响应

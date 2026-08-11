@@ -12,4 +12,7 @@ public class ConsultationStreamDTO {
     @NotBlank(message = "初始消息不能为空")
     @Size(max = 2000, message = "初始消息长度不能超过2000个字符")
     private String userMessage;
+
+    // 重试只重新生成 AI 回复，不重复保存用户消息
+    private Boolean retry = false;
 }

@@ -161,15 +161,24 @@
                 class="typing-indicator">
                 <div class="typing-dot" v-for="dot in 3" :key="dot"></div>
               </div>
-              <!-- ai错误提示 可能ai出bug了-->
-              <div v-else-if="msg.isError" class="error-message">
-                <p>{{ msg.content }}</p>
-              </div>
+              <!-- AI 已生成的内容即使后续失败也保留，便于用户继续阅读 -->
               <!-- ai正常回复  这里需要对ai返回的数据进行markdown渲染处理-->
-              <MarkdownRenderer v-else-if="msg.senderType === 2 && !msg.isError" :content="msg.content"
+              <MarkdownRenderer v-if="msg.senderType === 2 && msg.content" :content="msg.content"
                 :is-ai-message="true" />
               <!-- 用户的消息 -->
-              <p v-else-if="msg.content" v-html="formatUserMessage(msg.content)"></p>
+              <p v-else-if="msg.senderType === 1 && msg.content" v-html="formatUserMessage(msg.content)"></p>
+              <!-- ai错误提示 可能ai出bug了-->
+              <!-- AI 错误状态和重试入口 -->
+              <div v-if="msg.isError" class="error-message">
+                <div class="error-copy">
+                  <span class="error-title">AI 回复失败</span>
+                  <span class="error-detail">{{ msg.errorMessage }}</span>
+                </div>
+                <el-button class="retry-btn" size="small" :disabled="isAiTyping" @click="retryAIResponse(msg)">
+                  <el-icon><RefreshRight /></el-icon>
+                  重新生成
+                </el-button>
+              </div>
               <div v-if="msg.isStopped" class="stopped-message">已停止生成</div>
             </div>
             <div class="message-time">
@@ -629,7 +638,8 @@ const startNewSession = async (usermessage: string): Promise<void> => {
   }
 }
 //开启流式对话
-const startAIResponse = (sessionId: string, userMessage: string): void => {
+//isRetry只用于告诉后端本次是否为重新生成
+const startAIResponse = (sessionId: string, userMessage: string, isRetry = false): void => {
   //防止重复发送
   if (isAiTyping.value) {
     ElMessage.error('正在回复中，请稍后再发送')
@@ -640,7 +650,7 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
   const aiMessage = reactive<SessionMessage>({
     id: `ai_${Date.now()}_${Math.random().toString(36).substring(2)}`,//定义一个唯一的id
     senderType: 2,//AI助手消息
-    sessionId: currentSession.value!.sessionId,//会话ID
+    sessionId,//会话ID
     content: '',//消息内容
     createdAt: new Date().toISOString(),//创建时间
   })
@@ -648,6 +658,7 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
   const started = startStream({
     sessionId,
     userMessage,
+    isRetry,
     // 处理流式数据。追加到aiMessage.content中
     onChunk(content) {
       aiMessage.content += content
@@ -662,10 +673,11 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
       ])
     },
     onError(error) {
-      aiMessage.content = 'AI 回复失败，请稍后再重试'
       aiMessage.isError = true
+      aiMessage.errorMessage = error.message
       activeAiMessage.value = null
       ElMessage.error(error.message)
+      void scrollToBottom()
     },
   })
 
@@ -675,6 +687,33 @@ const startAIResponse = (sessionId: string, userMessage: string): void => {
     messages.value.push(aiMessage)
     void scrollToBottom(true)
   }
+}
+
+//重新生成：删除失败的AI消息，再按原来的startAIResponse流程请求一次
+const retryAIResponse = (message: SessionMessage): void => {
+  if (isAiTyping.value) {
+    ElMessage.warning('已有回复正在生成，请稍后再试')
+    return
+  }
+  if (!currentSession.value) {
+    return
+  }
+
+  // 找到失败的AI消息 对应的在列表中的索引
+  const failedMessageIndex = messages.value.findIndex(item => item.id === message.id)
+  if (failedMessageIndex <= 0) {
+    ElMessage.error('没有找到对应的用户问题，暂时无法重新生成')
+    return
+  }
+  // 找到失败的AI消息 对应的用户消息
+  const previousMessage = messages.value[failedMessageIndex - 1]
+  if (previousMessage.senderType !== 1) {
+    ElMessage.error('没有找到对应的用户问题，暂时无法重新生成')
+    return
+  }
+
+  messages.value.splice(failedMessageIndex, 1) //删除失败的AI消息
+  startAIResponse(currentSession.value.sessionId, previousMessage.content, true)
 }
 
 const handleStopGenerating = (): void => {
@@ -1234,15 +1273,36 @@ onUnmounted(() => {
 
             /* 错误消息样式 */
             .error-message {
+              margin-top: 10px;
               background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
               border: 1px solid #F87171;
               border-radius: 12px;
               padding: 12px 16px;
               color: #991B1B;
-              font-weight: 500;
               display: flex;
               align-items: center;
+              justify-content: space-between;
               gap: 8px;
+
+              .error-copy {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+
+                .error-title {
+                  font-size: 13px;
+                  font-weight: 600;
+                }
+
+                .error-detail {
+                  font-size: 12px;
+                  font-weight: 400;
+                }
+              }
+
+              .retry-btn {
+                flex-shrink: 0;
+              }
             }
 
             .stopped-message {

@@ -40,11 +40,11 @@ public class UserService {
             throw new BusinessException("用户不存在");
         }
         //判断密码是否正确
-        if (!user.getPassword().equals(commandDTO.getPassword())) {
-            if (!bCryptPasswordEncoder.matches(commandDTO.getPassword(), user.getPassword())) {
+        String inputPassword = commandDTO.getPassword().trim();
+        if (!bCryptPasswordEncoder.matches(inputPassword, user.getPassword())) {
                 throw new BusinessException("密码错误");
             }
-        }
+
         //判断用户状态（是否封号） , 用数据库查到的user信息来调用user实体类的isActive方法判断当前用户是否为正常状态
         if (!user.isActive()) {
             throw new BusinessException("用户已被封号,请联系管理员解封");

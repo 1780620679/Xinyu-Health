@@ -37,8 +37,8 @@ import { useRouter } from "vue-router"
 
 const ruleFormRef = ref(null)
 const formData = ref({
-  username: "xiaohao",
-  password: "123456",
+  username: "",
+  password: "",
 })
 const rules = ref({
   username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
