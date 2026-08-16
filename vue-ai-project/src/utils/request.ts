@@ -2,9 +2,11 @@ import { useAdminStore } from "@/stores/admin"
 import axios from "axios"
 import { ElMessage } from "element-plus"
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "/api").replace(/\/$/, "")
+
 // 创建axios实例
 const request = axios.create({
-  baseURL: "/api",
+  baseURL: apiBaseUrl,
   timeout: 5000,
 })
 

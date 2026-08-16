@@ -2,6 +2,8 @@ import { ref } from 'vue'
 import { fetchEventSource, type EventSourceMessage } from '@microsoft/fetch-event-source'
 import { useAdminStore } from '@/stores/admin'
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')
+
 interface StreamPayload {
   code: string | number
   message?: string
@@ -72,7 +74,7 @@ export const useChatStream = () => {
       options.onError(error)
     }
 
-    void fetchEventSource('/api/psychological-chat/stream', {
+    void fetchEventSource(`${apiBaseUrl}/psychological-chat/stream`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

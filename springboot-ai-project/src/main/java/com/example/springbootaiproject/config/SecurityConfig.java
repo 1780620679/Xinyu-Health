@@ -2,6 +2,7 @@ package com.example.springbootaiproject.config;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.example.springbootaiproject.utils.JwtAuthticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -12,11 +13,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration//标注这是一个配置类，用于配置Spring Security的Web安全配置
 @EnableWebSecurity//标注开启Web安全配置
 @EnableMethodSecurity//标注开启方法安全配置 ，用于配置方法级别的权限
 public class SecurityConfig {
+
+    @Value("${app.cors.allowed-origin}")
+    private String allowedOrigin;
 
     //定义一些不需要登录即可访问的路径
     private static final String[] PUBLIC_PATHS = {
@@ -53,6 +62,18 @@ public class SecurityConfig {
         return new JwtAuthticationFilter();
     }//所有安全相关的 Bean（过滤器、处理器等）都集中在这里声明，一目了然。如果散落到各个类上用 @Component，配置分散后不易维护。
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(allowedOrigin));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
 
     //配置Spring Security的过滤链，一般都是固定这样写的
@@ -61,6 +82,9 @@ public class SecurityConfig {
         http
                 //禁用CSRF保护(API服务不需要) 这就是默认网页会有一个登录表单
                 .csrf(AbstractHttpConfigurer::disable)
+                //配置CORS
+                // 允许所有来源、方法、头字段
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 //配置会话管理为无状态会话 （会话管理会通过JWT来实现）
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
