@@ -132,7 +132,8 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.example.springbootaiproject.SpringbootAiProjectApplication</mainClass>
-                    <skip>true</skip>
+                    <!-- 不跳过 Spring Boot 的可执行 JAR 重新打包，本地不必须但云上部署时需要 -->
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
