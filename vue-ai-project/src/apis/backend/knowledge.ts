@@ -24,7 +24,7 @@ export const uploadFileAPI = (file: File, businessInfo: { businessId: string }):
   formData.append("file", file)  // 图片本身
   formData.append("businessType", "ARTICLE")  // 硬编码，永远是 "ARTICLE" OSS 子目录名，ARTICLE/xxx.jpg。如果传 "USER_AVATAR" 就会存到 USER_AVATAR/ 目录
   formData.append("businessId", businessInfo.businessId)//❌ OSS 版本没用	旧版存在 sys_file_info 表里关联业务记录，OSS 版本不存数据库了
-  formData.append("businessFiled", "cover")  //表示"这是封面图"（不是正文图/头像），OSS 版本不需要区分，无用
+  formData.append("businessFiled", "cover")//❌ OSS 版本没用  //表示"这是封面图"（不是正文图/头像），OSS 版本不需要区分，无用
   return request({
     url: "/file/upload",
     method: "post",

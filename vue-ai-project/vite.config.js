@@ -6,7 +6,7 @@ import path from "path"
 export default defineConfig(({ mode }) => {
   // 加载环境变量：mode=当前模式(development/production等)，process.cwd()=项目根目录，""=加载所有环境变量(不仅限于VITE_前缀)
   const env = loadEnv(mode, process.cwd(), "")
-  const devPort = Number(env.DEV_PORT || 5173)
+  const devPort = Number(env.DEV_PORT || 5174)
   const apiProxyTarget = env.API_PROXY_TARGET || "http://localhost:1920"
   // target: "http://159.75.169.224:1235"
   return {

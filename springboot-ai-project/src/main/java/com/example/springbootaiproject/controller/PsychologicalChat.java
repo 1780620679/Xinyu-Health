@@ -58,7 +58,9 @@ public class PsychologicalChat {
      */
 
     // 流式返回聊天结果 使用 Flux 实现
-    //Flux<ServerSentEvent<String>>：这是 Spring WebFlux 的响应式类型。Flux 表示"0 到 N 个元素的异步流"，ServerSentEvent<String> 表示每个元素是一个 SSE 事件，数据体是 String。结合起来就是：这个方法会持续推送多条 SSE 事件给前端，比如 AI 逐字生成回复时，每个字/词作为一个事件推出去。
+    //Flux<ServerSentEvent<String>>：这是 Spring WebFlux 的响应式类型。Flux 表示"0 到 N 个元素的异步流"，
+    // ServerSentEvent<String> 表示每个元素是一个 SSE 事件，数据体是 String。
+    // 结合起来就是：这个方法会持续推送多条 SSE 事件给前端，比如 AI 逐字生成回复时，每个字/词作为一个事件推出去。
     @PostMapping(value="/stream",produces = "text/event-stream")
     public Flux<ServerSentEvent<String>> stream(@RequestBody ConsultationStreamDTO streamDTO) {
         // 获取当前用户
@@ -80,6 +82,7 @@ public class PsychologicalChat {
                         streamDTO.getSessionId(),
                         streamDTO.getUserMessage(),
                         Boolean.TRUE.equals(streamDTO.getRetry()))//此时返回的是一个字符串流
+                //这里开始对service返回的字符串流进行处理，将其转换为 ServerSentEvent<String> 流
                 .map(fragment -> {
                     return ServerSentEvent.<String>builder()
                         .event("message")

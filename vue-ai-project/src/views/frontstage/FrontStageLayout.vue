@@ -30,7 +30,9 @@
       <!-- 路由出口，根据路由动态加载组件，并添加过渡效果 -->
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
-          <component :is="Component" :key="$route.path" />
+          <keep-alive :include="cachedViews">
+            <component :is="Component" :key="$route.path" />
+          </keep-alive>
         </transition>
       </router-view>
     </div>
@@ -55,6 +57,7 @@ const router = useRouter()
 const adminStore = useAdminStore()
 import { ElMessage, ElMessageBox } from "element-plus"
 const isLogin = ref(false)
+const cachedViews = ['Consultation', 'EmotionDiary', 'Knowledge']
 const logo = new URL('@/assets/images/心屿.png', import.meta.url).href
 
 const isDark = ref(adminStore.isDark)
