@@ -48,22 +48,22 @@ public class SysFileInfoService {
 
     public FileUploadResponseDTO upload(MultipartFile file, String businessType,
                                          String businessId, String businessField) {
-        String originalName = file.getOriginalFilename();
-        String ext = StrUtil.isNotBlank(originalName) ? originalName.substring(originalName.lastIndexOf(".")) : "";
-        String storedName = IdUtil.fastSimpleUUID() + ext;
+        String originalName = file.getOriginalFilename();// 原始文件名
+        String ext = StrUtil.isNotBlank(originalName) ? originalName.substring(originalName.lastIndexOf(".")) : "";// 文件扩展名
+        String storedName = IdUtil.fastSimpleUUID() + ext;// 生成随机文件名
 
-        String subDir = StrUtil.isNotBlank(businessType) ? businessType : "common";
-        String ossKey = subDir + "/" + storedName;
+        String subDir = StrUtil.isNotBlank(businessType) ? businessType : "common";// 子目录
+        String ossKey = subDir + "/" + storedName;// OSS 键
 
         try (InputStream inputStream = file.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setObjectAcl(com.aliyun.oss.model.CannedAccessControlList.PublicRead);
-            ossClient.putObject(bucketName, ossKey, inputStream, metadata);
+            ossClient.putObject(bucketName, ossKey, inputStream, metadata);// 上传文件到 OSS
         } catch (Exception e) {
             throw new RuntimeException("OSS 上传失败", e);
         }
 
-        String url = "https://" + bucketName + "." + endpoint + "/" + ossKey;
+        String url = "https://" + bucketName + "." + endpoint + "/" + ossKey;// 完整 OSS 访问 URL
 
         return FileUploadResponseDTO.builder()
                 .filePath("/" + ossKey)

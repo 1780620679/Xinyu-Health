@@ -175,7 +175,9 @@
                   <span class="error-detail">{{ msg.errorMessage }}</span>
                 </div>
                 <el-button class="retry-btn" size="small" :disabled="isAiTyping" @click="retryAIResponse(msg)">
-                  <el-icon><RefreshRight /></el-icon>
+                  <el-icon>
+                    <RefreshRight />
+                  </el-icon>
                   重新生成
                 </el-button>
               </div>
@@ -199,8 +201,7 @@
           </div>
         </div>
         <!-- 右侧发送按钮 -->
-        <el-button v-if="isAiTyping" class="send-btn stop-btn" type="danger" title="停止生成"
-          @click="handleStopGenerating">
+        <el-button v-if="isAiTyping" class="send-btn stop-btn" type="danger" title="停止生成" @click="handleStopGenerating">
           <el-icon>
             <VideoPause />
           </el-icon>
@@ -216,13 +217,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted, reactive, nextTick } from 'vue';
+import { onMounted, ref, onUnmounted, reactive, nextTick, onDeactivated, onActivated } from 'vue';
 import { deleteSessionAPI, getSessionDetailAPI, getSessionListAPI, getSessionEmotionAPI, startSessionAPI, } from '@/apis/frontend/consultation'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { useChatStream } from '@/composables/useChatStream';
 import * as echarts from 'echarts';
 import type { SessionMessage, SessionInfo, SessionEmotionResponse, StartSessionParams } from '@/types/frontstage/consultation';
+
+defineOptions({ name: 'Consultation' })
 
 // 图标
 const logoUrl = new URL('@/assets/images/心屿.png', import.meta.url).href
@@ -248,11 +251,11 @@ const handleChatScroll = (): void => {
   const container = chatMessagesRef.value
   if (!container) return
   const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight
-// scrollTop：当前已经向下滚动了多少距离。
-// scrollHeight：消息列表全部内容的总高度。
-// clientHeight：当前肉眼能看到的区域高度。
-// distanceToBottom：距离底部的距离。
-// 当距离底部小于80px时，自动滚动到底部 大于80px时，说明用户在往上滑动，不自动滚动到底部
+  // scrollTop：当前已经向下滚动了多少距离。
+  // scrollHeight：消息列表全部内容的总高度。
+  // clientHeight：当前肉眼能看到的区域高度。
+  // distanceToBottom：距离底部的距离。
+  // 当距离底部小于80px时，自动滚动到底部 大于80px时，说明用户在往上滑动，不自动滚动到底部
   shouldAutoScroll.value = distanceToBottom < 80
 }
 //当用户在上面滑动时，shouldAutoScroll为false，然后此时发送消息，调用scrollToBottom(true)强制滚动到底部
@@ -275,7 +278,7 @@ const scrollToBottom = async (force = false): Promise<void> => {
   // 这时新消息可能还没有渲染出来，获得的还是旧高度。
   await nextTick()
   if (scrollFrameId !== null) return
-//window.requestAnimationFrame 是一个异步函数，用于在浏览器重绘前执行指定的回调函数
+  //window.requestAnimationFrame 是一个异步函数，用于在浏览器重绘前执行指定的回调函数
   // 使用它来进行记录一个scrollFrameId，不然每次ai输出一个字符，滚动条就会大量一点点滚动，影响性能
   // 如果每一个片段都立刻滚动，可能短时间调用几十次，造成：
   // 页面频繁重新计算布局；
@@ -283,7 +286,7 @@ const scrollToBottom = async (force = false): Promise<void> => {
   // 性能浪费。
   // requestAnimationFrame 可以理解成：
   // 等浏览器准备绘制下一帧画面时，再执行滚动。
-// 一般屏幕一秒刷新大约 60 次，因此每帧约 16.7 毫秒。
+  // 一般屏幕一秒刷新大约 60 次，因此每帧约 16.7 毫秒。
   scrollFrameId = window.requestAnimationFrame(() => {
     scrollFrameId = null
     const container = chatMessagesRef.value
@@ -512,6 +515,34 @@ const handleSessionClick = async (session: SessionInfo): Promise<void> => {
 
 }
 // 删除会话
+// ============ 删除当前会话的历史 Bug ============
+// 【产生原因】
+//   删除「当前正在查看的会话」时，页面状态没有被重置，带来两个问题：
+//   1) 残留显示：左侧列表里该会话已消失，但右侧聊天区 / 情绪花园仍显示着它的旧消息和旧情绪，
+//      用户卡在一个「已不存在的会话」上，甚至还能继续往已删除会话发消息而报错。
+//   2) 旧 SSE 流回调污染：若删除时 AI 还在流式输出（fetchEventSource 连接未断），
+//      旧连接在结束时会触发 onDone/onclose → 调用 getEmotionAnalysis(已删除会话)，
+//      结果要么 404，要么用一条死会话的数据覆盖当前情绪花园。
+// 【现在的解决逻辑】
+//   1) 先判断“删的是不是当前正在看的会话”：currentSession.sessionId 在 handleSessionClick
+//      里存的是带前缀的 "session_123"，而删除按钮传进来的 session.id 是原始值 "123"，
+//      所以这里要用 'session_' + sessionId 才能对上；否则 === 永不成立，重置分支不执行。
+//   2) 命中后调用 createNewConversation()：它内部先 stopStream() 断开残留的旧 SSE 流
+//      （避免旧流结束后再回调 getEmotionAnalysis），再清空 messages、把 currentSession
+//      重置为新的临时会话、情绪花园归位，从而同时消除上面两个问题。
+// =================================================
+// 追问1：“旧 SSE 流污染是什么问题？”
+
+// “用户删除当前会话时，如果 AI 还在流式输出，旧的 fetchEventSource 连接还没断。连接关闭时会触发 onDone 回调，里面会去拉情绪分析数据。这时候会话已经被删了，要么 404，要么把情绪花园用一条死会话的数据覆盖了。”
+
+// 追问2：“你怎么解决的？”
+
+// “我在流关闭的回调里加了一层校验，判断当前会话是否还存在。如果会话已经被删除，就不触发后续的情绪分析请求。
+// 同时删除会话时也会主动中断当前的 SSE 连接，避免旧流继续回调。”
+
+// 追问3：“这算不算竞态问题？”
+
+// “算，本质上是异步回调执行时，依赖的状态已经失效了。解决思路就是在回调里重新校验状态，而不是依赖回调触发时的上下文。”
 const handelDeleteSession = async (sessionId: string): Promise<void> => {
   ElMessageBox.confirm('确定删除该会话吗？', '删除确认', {
     confirmButtonText: '确定',
@@ -520,11 +551,11 @@ const handelDeleteSession = async (sessionId: string): Promise<void> => {
   }).then(async () => {
     await deleteSessionAPI(sessionId)
     ElMessage.success('删除成功')
-     // 如果删除的是当前正在看的会话，重置到新会话  // 先重置当前会话（防止旧 SSE 流关闭时触发情绪分析）
+    // 如果删除的是当前正在看的会话，重置到新会话  // 先重置当前会话（防止旧 SSE 流关闭时触发情绪分析）
     if (currentSession.value && currentSession.value.sessionId === 'session_' + sessionId) {
-        createNewConversation()   // ← 清空消息 + 新建临时会话
+      createNewConversation()   // ← 清空消息 + 新建临时会话
     }
-     //删除成功后，刷新会话列表
+    //删除成功后，刷新会话列表
     getSessionList()
   })
 }
@@ -727,7 +758,17 @@ const handleStopGenerating = (): void => {
   void scrollToBottom(true)
 }
 
-onMounted(() => {
+// onMounted(() => {
+//   //创建一个临时会话
+//   createNewConversation()
+//   //获取会话历史列表
+//   getSessionList()
+//   // 初始化图表
+//   initChart()
+// })
+
+onActivated(() => {
+  console.log('2222');
   //创建一个临时会话
   createNewConversation()
   //获取会话历史列表
@@ -736,8 +777,11 @@ onMounted(() => {
   initChart()
 })
 
-onUnmounted(() => {
-  // 离开页面时终止仍在进行的 SSE 请求，避免内存和网络资源泄漏
+// keep-alive 缓存后，离开页面改由 onDeactivated 触发（onUnmounted 不再执行）
+onDeactivated(() => {
+  console.log('1111');
+
+  // 终止仍在进行的 SSE 请求，避免切走后仍在后台接收流式数据
   stopStream()
   activeAiMessage.value = null
   if (scrollFrameId !== null) {
@@ -750,6 +794,21 @@ onUnmounted(() => {
     chart = null
   }
 })
+//onDeactivated 触发后，onUnmounted 不再执行
+// onUnmounted(() => {
+//   // 离开页面时终止仍在进行的 SSE 请求，避免内存和网络资源泄漏
+//   stopStream()
+//   activeAiMessage.value = null
+//   if (scrollFrameId !== null) {
+//     window.cancelAnimationFrame(scrollFrameId)
+//     scrollFrameId = null
+//   }
+//   // 销毁图表实例
+//   if (chart) {
+//     chart.dispose()
+//     chart = null
+//   }
+// })
 
 </script>
 <style scoped lang="scss">
