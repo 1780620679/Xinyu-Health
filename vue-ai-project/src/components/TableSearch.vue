@@ -4,7 +4,20 @@
       <template v-for="item in formDataAttrs">
         <el-col v-bind="item.col">
           <el-form-item :label="item.label" :prop="item.prop">
+            <!--
+              特殊筛选扩展：配置项带 slot: true 时走具名插槽，由父组件自定义控件
+              - 适用场景：日期区间、级联选择等内置类型覆盖不到的个性化筛选
+              - 通过 :form-data 把响应式 formData 透传给父组件，父组件用
+                <template #propName="{ formData }"> 拿到后直接 v-model="formData.xxx"
+                保证数据仍统一收口在 formData 中，搜索/重置逻辑不受影响
+              - 组件对未知控件保持"开闭原则"：对扩展开放、对修改关闭
+            -->
+            <template v-if="item.slot">
+              <slot :name="item.prop" :form-data="formData"></slot>
+            </template>
+            <!-- 普通筛选：按 comp 类型映射内置组件，动态绑定字段值 -->
             <component
+              v-else
               :is="isComp(item.comp)"
               v-model="formData[item.prop]"
               :placeholder="item.placeholder"

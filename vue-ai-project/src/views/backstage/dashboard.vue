@@ -121,6 +121,7 @@
 <script setup lang="ts">
 import { getOverviewAPI } from "@/apis/backend/dashboard"
 import { onMounted, ref } from "vue"
+import { formatDate } from "@/utils/formatDate"
 
 // echarts----------------------------------------------------------------------------------
 import * as echarts from "echarts"
@@ -176,7 +177,7 @@ const initEmotionChart = () => {
     // 图表x轴(时间)
     xAxis: {
       type: 'category',
-      data: TrendData.map(item => item.date),
+      data: TrendData.map(item => formatDate(item.date)),
       axisLine: {
         lineStyle: {
           color: 'rgba(244, 162, 97, 0.3)'
@@ -307,7 +308,7 @@ const initConsultationChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: dailyTrend.map(item => item.date),
+      data: dailyTrend.map(item => formatDate(item.date)),
       axisLine: {
         lineStyle: {
           color: 'rgba(244, 162, 97, 0.3)'
@@ -426,7 +427,7 @@ const initUserActiveChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: activityData.map(item => item.date),
+      data: activityData.map(item => formatDate(item.date)),
       axisLine: {
         lineStyle: {
           color: 'rgba(244, 162, 97, 0.3)'

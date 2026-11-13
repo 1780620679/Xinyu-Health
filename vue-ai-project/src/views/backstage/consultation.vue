@@ -16,7 +16,9 @@
       </el-table-column>
       <el-table-column label="消息数量" width="100" prop="messageCount">
       </el-table-column>
-      <el-table-column label="时间" width="100" prop="lastMessageTime"></el-table-column>
+      <el-table-column label="时间" width="120">
+        <template #default="scope">{{ formatDate(scope.row.lastMessageTime) }}</template>
+      </el-table-column>
       <el-table-column label="详情" width="100">
         <template #default="scope">
           <el-button text type="primary" @click="handleSessionDetail(scope.row)">详情</el-button>
@@ -40,7 +42,7 @@
           </div>
           <div class="detail-row">
             <div class="detail-label">开始时间</div>
-            <div class="detail-value">{{ sessionDetail.startdAt }}</div>
+            <div class="detail-value">{{ formatDate(sessionDetail.startdAt) }}</div>
           </div>
         </div>
         <div class="messages-container">
@@ -52,7 +54,7 @@
               :class="message.senderType === 1 ? 'user-message' : 'ai-message'">
               <div class="message-header">
                 <span class="sender">{{ message.senderType === 1 ? '用户' : 'AI' }}</span>
-                <span class="time">{{ message.createdAt }}</span>
+                <span class="time">{{ formatDate(message.createdAt) }}</span>
               </div>
               <div class="message-content">{{ message.content }}</div>
             </div>
@@ -73,6 +75,7 @@ import { getConsultationDataAPI, getSessionMessagesAPI } from '@/apis/backend/co
 import { onMounted, ref } from 'vue';
 import PageHead from './components/PageHead.vue';
 import { ConsultationDataParams, ConsultationDataResponse, Records, SessionMessage } from '@/types/backstage/consultation';
+import { formatDate } from '@/utils/formatDate';
 
 // 表格数据
 const tableData = ref<Records[]>([])

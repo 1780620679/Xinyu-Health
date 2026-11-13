@@ -17,6 +17,7 @@
     "axios": "^1.15.1",
     "echarts": "^6.0.0",
     "element-plus": "^2.13.7",
+    "highlight.js": "^11.12.0",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",
     "sass": "^1.97.2",

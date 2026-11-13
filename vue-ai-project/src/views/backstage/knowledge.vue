@@ -17,7 +17,9 @@
       </el-table-column>
       <el-table-column label="作者" width="150" prop="authorName"></el-table-column>
       <el-table-column label="阅读量" width="150" prop="readCount"></el-table-column>
-      <el-table-column label="发布时间" width="150" prop="publishedAt"></el-table-column>
+      <el-table-column label="发布时间" width="150">
+        <template #default="scope">{{ formatDate(scope.row.publishedAt) }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
           <el-button text type="primary" @click="handleEdit(scope.row)">编辑</el-button>
@@ -48,6 +50,7 @@ import ArticleDialog from "@/components/ArticleDialog.vue"
 import TableSearch from "@/components/TableSearch.vue"
 import PageHead from "./components/PageHead.vue"
 import { KnowledgeArticle, KnowledgeArticlePageParams, CategoryTreeItem, CategoryOption, KnowledgeSearchForm, KnowledgeArticleDetail } from "@/types/backstage/knowledge"
+import { formatDate } from "@/utils/formatDate"
 
 // 引入加载状态
 const loading = ref(false)

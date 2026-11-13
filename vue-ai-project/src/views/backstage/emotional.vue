@@ -10,7 +10,9 @@
           <el-avatar>{{ scope.row.nickname }}</el-avatar>
         </template>
       </el-table-column>
-      <el-table-column label="记录日期" width="120" prop="diaryDate"></el-table-column>
+      <el-table-column label="记录日期" width="120">
+        <template #default="scope">{{ formatDate(scope.row.diaryDate) }}</template>
+      </el-table-column>
       <el-table-column label="情绪评分" width="200">
         <template #default="scope">
           <el-rate :model-value="scope.row.moodScore" :max="10" disabled></el-rate>
@@ -46,7 +48,7 @@
             <el-descriptions-item label="用户名">{{ sessionDetail.username }}</el-descriptions-item>
             <el-descriptions-item label="昵称">{{ sessionDetail.nickname }}</el-descriptions-item>
             <el-descriptions-item label="用户ID">{{ sessionDetail.userId }}</el-descriptions-item>
-            <el-descriptions-item label="记录日期">{{ sessionDetail.diaryDate }}</el-descriptions-item>
+            <el-descriptions-item label="记录日期">{{ formatDate(sessionDetail.diaryDate) }}</el-descriptions-item>
           </el-descriptions>
         </div>
         <!-- 情绪状态 -->
@@ -116,8 +118,8 @@
         <div class="detail-section">
           <h4>时间信息</h4>
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="更新时间">{{ sessionDetail.updatedAt }}</el-descriptions-item>
-            <el-descriptions-item label="创建时间">{{ sessionDetail.createdAt }}</el-descriptions-item>
+            <el-descriptions-item label="更新时间">{{ formatDate(sessionDetail.updatedAt) }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{ formatDate(sessionDetail.createdAt) }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
@@ -138,6 +140,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import PageHead from './components/PageHead.vue';
 import TableSearch from '@/components/TableSearch.vue';
 import { EmotionalPageParams, EmotionalDiary, AIEmotionAnalysis, } from '@/types/backstage/emotional';
+import { formatDate } from '@/utils/formatDate';
 
 // 状态映射
 const getEmotionTagType = (emotion: string) => {

@@ -17,10 +17,10 @@
           {{ userTypeText }}
         </el-descriptions-item>
         <el-descriptions-item label="注册时间">
-          {{ userInfo.createdAt || '-' }}
+          {{ formatDate(userInfo.createdAt) }}
         </el-descriptions-item>
         <el-descriptions-item label="最后更新">
-          {{ userInfo.updatedAt || '-' }}
+          {{ formatDate(userInfo.updatedAt) }}
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -34,6 +34,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useAdminStore } from '@/stores/admin'
+import { formatDate } from '@/utils/formatDate'
 
 const props = defineProps({
   modelValue: {

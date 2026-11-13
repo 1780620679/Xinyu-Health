@@ -74,7 +74,7 @@
               <div class="session-title">
                 <span>{{ session.sessionTitle }}</span>
                 <div class="session-meta">
-                  <span class="session-time">{{ session.startedAt }}</span>
+                  <span class="session-time">{{ formatDate(session.startedAt) }}</span>
                 </div>
                 <div class="session-preview">
                   {{ session.lastMessageContent }}
@@ -184,7 +184,7 @@
               <div v-if="msg.isStopped" class="stopped-message">已停止生成</div>
             </div>
             <div class="message-time">
-              {{ msg.senderType === 2 && isAiTyping && msg.id === activeAiMessage?.id ? '正在回复中...' : msg.createdAt }}
+              {{ msg.senderType === 2 && isAiTyping && msg.id === activeAiMessage?.id ? '正在回复中...' : formatDate(msg.createdAt) }}
             </div>
           </div>
         </div>
@@ -224,6 +224,7 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { useChatStream } from '@/composables/useChatStream';
 import * as echarts from 'echarts';
 import type { SessionMessage, SessionInfo, SessionEmotionResponse, StartSessionParams } from '@/types/frontstage/consultation';
+import { formatDate } from '@/utils/formatDate';
 
 defineOptions({ name: 'Consultation' })
 
@@ -768,7 +769,7 @@ const handleStopGenerating = (): void => {
 // })
 
 onActivated(() => {
-  console.log('2222');
+  // console.log('2222');
   //创建一个临时会话
   createNewConversation()
   //获取会话历史列表
@@ -779,7 +780,7 @@ onActivated(() => {
 
 // keep-alive 缓存后，离开页面改由 onDeactivated 触发（onUnmounted 不再执行）
 onDeactivated(() => {
-  console.log('1111');
+  // console.log('1111');
 
   // 终止仍在进行的 SSE 请求，避免切走后仍在后台接收流式数据
   stopStream()
