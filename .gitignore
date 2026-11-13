@@ -20,10 +20,8 @@ springboot-ai-project/.codebuddy/
 .env.*
 !.env.example
 
-# ===== 除README外，所有md/txt笔记文档不提交 =====
+# ===== 除README外，所有md/txt笔记文档脚本等不提交 =====
 ai-health.txt
-心屿健康-超级详细学习文档.md
-心理健康面试问题与回答.md
-springboot-ai-project/咨询记录模块BUG总结.md
-springboot-ai-project/接口文档.md
-springboot-ai-project/项目剩余部分开发完整指南.md
+*.md
+!README.md
+scripts/
